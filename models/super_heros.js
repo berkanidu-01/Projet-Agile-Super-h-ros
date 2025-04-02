@@ -14,7 +14,6 @@ class Superhero {
       if (err) {
         callback(err, null);
       } else {
-        // Transformer chaque ligne en une instance de Superhero
         const superheroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
         callback(null, superheroes);
       }

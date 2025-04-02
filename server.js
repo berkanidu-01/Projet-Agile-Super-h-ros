@@ -6,7 +6,6 @@ const Defense = require('./models/defenses'); // Import du modèle Defense
 const app = express();
 const port = 3000;
 
-// Middleware pour parser les requêtes JSON
 app.use(express.json());
 
 // Route pour récupérer tous les super-héros
@@ -16,7 +15,7 @@ app.get('/api/superheros', (req, res) => {
       console.error('Erreur lors de la récupération des super-héros :', err.message);
       res.status(500).send('Erreur serveur');
     } else {
-      res.send(superheroes); // Retourne des instances de Superhero
+      res.send(superheroes);
     }
   });
 });
@@ -31,7 +30,7 @@ app.get('/api/superheroes/:id', (req, res) => {
     } else if (!superhero) {
       res.status(404).send('Super-héros non trouvé');
     } else {
-      res.send(superhero); // Retourne une instance de Superhero
+      res.send(superhero); 
     }
   });
 });
@@ -46,7 +45,7 @@ app.get('/api/superheroes/:id/powerstats', (req, res) => {
     } else if (!powerstats) {
       res.status(404).send('Statistiques non trouvées');
     } else {
-      res.send(powerstats); // Retourne un objet contenant les statistiques
+      res.send(powerstats);
     }
   });
 });
@@ -58,7 +57,7 @@ app.get('/api/attacks', (req, res) => {
       console.error('Erreur lors de la récupération des attaques :', err.message);
       res.status(500).send('Erreur serveur');
     } else {
-      res.send(attacks); // Retourne des instances de Attack
+      res.send(attacks);
     }
   });
 });
@@ -70,12 +69,12 @@ app.get('/api/defenses', (req, res) => {
       console.error('Erreur lors de la récupération des défenses :', err.message);
       res.status(500).send('Erreur serveur');
     } else {
-      res.send(defenses); // Retourne des instances de Defense
+      res.send(defenses);
     }
   });
 });
 
-// Démarrage du serveur
+
 app.listen(port, () => {
   console.log(`Serveur démarré sur http://localhost:${port}`);
 });

@@ -14,7 +14,6 @@ class Defense {
       if (err) {
         callback(err, null);
       } else {
-        // Transformer chaque ligne en une instance de Defense
         const defenses = rows.map(row => new Defense(row.BASE_STAT, row.NAME, row.MULTIPLICATEUR));
         callback(null, defenses);
       }

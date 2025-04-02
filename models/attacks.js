@@ -14,7 +14,6 @@ class Attack {
       if (err) {
         callback(err, null);
       } else {
-        // Transformer chaque ligne en une instance de Attack
         const attacks = rows.map(row => new Attack(row.BASE_STAT, row.NAME, row.MULTIPLICATEUR));
         callback(null, attacks);
       }
