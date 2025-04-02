@@ -39,7 +39,7 @@ function setupPlayer(playerId, callback) {
         const player = {
           id: playerId,
           superhero: champion,
-          hp: 100,
+          hp: 1000,
           attacks,
           defenses,
         };
