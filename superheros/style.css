@@ -99,7 +99,7 @@ h1 {
 .movescard {
     align-items: center;
     text-align: left;
-    margin: 20px auto;
+    margin: 2% auto;
     width: 95%;
     max-width: 800px;
     border: none;
@@ -110,12 +110,14 @@ h1 {
 }
 
 .movescard button {
-	color: #286666;
+	padding: 2.5% 5%;
+	margin: 2%;
+	color: #f8961e;
 	text-decoration: solid;
 	border-width: 7px;
-	border-color:#3a151f;
+	border-color:#f72585;
     border-radius: 12px;
-    background-color: #f72585;
+    background-color: #3a151f;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 

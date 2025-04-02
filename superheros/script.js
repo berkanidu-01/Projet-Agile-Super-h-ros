@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Ajouter un bouton pour recharger le héros
-  const header = document.querySelector('.site-header');
+  /*const header = document.querySelector('.site-header');
   if (header) {
     const refreshButton = document.createElement('button');
     refreshButton.textContent = 'Charger Héros ID=1';
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
     refreshButton.addEventListener('click', initWithHeroId1);
     header.appendChild(refreshButton);
     console.log("Bouton 'Charger Héros ID=1' ajouté");
-  }
+  }*/
 
   // Animation des barres de progression pour les stats existantes
   const statElements = document.querySelectorAll('.heroStats p');

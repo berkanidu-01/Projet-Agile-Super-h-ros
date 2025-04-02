@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const Superhero = require('./models/super_heros'); // Import du modèle Superhero
 const Attack = require('./models/attacks'); // Import du modèle Attack
 const Defense = require('./models/defenses'); // Import du modèle Defense
@@ -7,6 +8,14 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
+
+// Serve static files from the "superheros" directory
+app.use(express.static(path.join(__dirname, 'superheros')));
+
+// Route for the root URL to serve the index.html file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'superheros', 'index.html'));
+});
 
 // Route pour récupérer tous les super-héros
 app.get('/api/superheros', (req, res) => {
@@ -34,7 +43,6 @@ app.get('/api/superheroes/:id', (req, res) => {
     }
   });
 });
-
 
 // Route pour récupérer les statistiques d'un super-héros par ID
 app.get('/api/superheroes/:id/powerstats', (req, res) => {
@@ -86,7 +94,6 @@ app.get('/api/superheroes/random-pair', (req, res) => {
     });
   });
 
-
 app.listen(port, () => {
-  console.log(`Serveur démarré sur http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
