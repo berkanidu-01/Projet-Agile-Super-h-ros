@@ -75,6 +75,17 @@ app.get('/api/defenses', (req, res) => {
   });
 });
 
+app.get('/api/superheroes/random-pair', (req, res) => {
+    Superhero.getRandomPair((err, heroes) => {
+      if (err) {
+        console.error('Erreur lors de la récupération des super-héros aléatoires :', err.message);
+        res.status(500).send('Erreur serveur');
+      } else {
+        res.send(heroes);
+      }
+    });
+  });
+
 
 app.listen(port, () => {
   console.log(`Serveur démarré sur http://localhost:${port}`);

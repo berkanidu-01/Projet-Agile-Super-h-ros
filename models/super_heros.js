@@ -69,6 +69,19 @@ class Superhero {
       }
     });
   }
+  static getRandomPair(callback) {
+    const sql = 'SELECT * FROM superheroes ORDER BY RANDOM() LIMIT 2';
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        callback(err, null);
+      } else if (rows.length < 2) {
+        callback(new Error('Pas assez de super-héros dans la base de données'), null);
+      } else {
+        const heroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
+        callback(null, heroes);
+      }
+    });
+  }
 }
 
 module.exports = Superhero;
