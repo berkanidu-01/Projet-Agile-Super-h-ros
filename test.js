@@ -67,6 +67,8 @@ function gameLoop(player1, player2) {
     console.log(`\n--- Tour du joueur ${attacker.id} ---`);
     console.log(`Champion : ${attacker.superhero.name}`);
     console.log('Statistiques :', attacker.superhero.powerstats);
+
+    // Phase d'attaque
     console.log('Attaques disponibles :');
     attacker.attacks.forEach((atk, index) => {
       console.log(`  ${index}: ${atk.name} (Stat de base : ${atk.baseStat}, Multiplicateur : ${atk.multiplicateur})`);
@@ -79,29 +81,38 @@ function gameLoop(player1, player2) {
         attackIndex = 0;
       }
 
-      const defenseIndex = Math.floor(Math.random() * defender.defenses.length);
-      const chosenDefense = defender.defenses[defenseIndex];
+      // Phase de défense
+      console.log('Défenses disponibles :');
+      defender.defenses.forEach((def, index) => {
+        console.log(`  ${index}: ${def.name} (Stat de base : ${def.baseStat}, Multiplicateur : ${def.multiplicateur})`);
+      });
 
-      console.log(`Défense choisie pour le joueur ${defender.id} : ${chosenDefense.name} (Stat de base : ${chosenDefense.baseStat}, Multiplicateur : ${chosenDefense.multiplicateur})`);
-
-      try {
-        const result = combatEngine.processTurn(attacker, defender, attackIndex, defenseIndex);
-        console.log(`Le joueur ${attacker.id} utilise ${result.attackUsed} et inflige ${result.damage} dégâts !`);
-        console.log(`HP restants du joueur ${defender.id} : ${result.defenderHp}`);
-
-        if (result.isDefeated) {
-          console.log(`\nLe joueur ${defender.id} (${defender.superhero.name}) est vaincu !`);
-          console.log(`Le joueur ${attacker.id} (${attacker.superhero.name}) remporte le combat !`);
-          rl.close();
-          return;
+      askQuestion(`Joueur ${defender.id}, choisissez une défense (0-${defender.defenses.length - 1}) : `, (defenseIndex) => {
+        defenseIndex = parseInt(defenseIndex, 10);
+        if (isNaN(defenseIndex) || defenseIndex < 0 || defenseIndex >= defender.defenses.length) {
+          console.log('Choix invalide. Défense par défaut sélectionnée (index 0).');
+          defenseIndex = 0;
         }
-      } catch (err) {
-        console.error('Erreur pendant le tour :', err.message);
-      }
 
-      // Inverser les rôles pour le prochain tour
-      [attacker, defender] = [defender, attacker];
-      nextTurn();
+        try {
+          const result = combatEngine.processTurn(attacker, defender, attackIndex, defenseIndex);
+          console.log(`Le joueur ${attacker.id} utilise ${result.attackUsed} contre ${defender.superhero.name} (${result.defenseUsed})`);
+          console.log(`Dégâts infligés : ${result.damage}, HP restants de ${defender.superhero.name} : ${result.defenderHp}`);
+
+          if (result.isDefeated) {
+            console.log(`\nLe joueur ${defender.id} (${defender.superhero.name}) est vaincu !`);
+            console.log(`Le joueur ${attacker.id} (${attacker.superhero.name}) remporte le combat !`);
+            rl.close();
+            return;
+          }
+        } catch (err) {
+          console.error('Erreur pendant le tour :', err.message);
+        }
+
+        // Inverser les rôles pour le prochain tour
+        [attacker, defender] = [defender, attacker];
+        nextTurn();
+      });
     });
   }
 
