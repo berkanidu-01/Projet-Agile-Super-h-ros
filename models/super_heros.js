@@ -9,7 +9,7 @@ class Superhero {
   }
 
   static getAll(callback) {
-    const sql = 'SELECT * FROM SuperHeroes';
+    const sql = 'SELECT * FROM SuperHeros';
     db.all(sql, [], (err, rows) => {
       if (err) {
         callback(err, null);
