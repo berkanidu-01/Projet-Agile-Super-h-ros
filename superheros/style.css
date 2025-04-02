@@ -1,0 +1,55 @@
+body {
+	background-color: #525252;
+}
+
+#heroContainer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 5% 10%;
+}
+
+#heroRight {
+	margin-left:5%;
+	margin-right:10%;
+}
+
+#heroLeft {
+	margin-left:10%;
+	margin-right:5%;
+}
+
+.username, .heroName {
+	text-align:center;
+}
+
+.card {
+	align-items: center;
+	text-align: left;
+	text-indent: 10%;
+	margin: 10px auto;
+	width: 95%;
+	max-width: 35%;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background-color: #757575;
+}
+
+.heroRow {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding: 10px;
+}
+
+.heroImg {
+	width: 150px;
+	height: auto;
+	border-radius: 8px;
+}
+
+.heroStats p {
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5em 0;
+}
