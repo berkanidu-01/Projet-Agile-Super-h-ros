@@ -1,3 +1,6 @@
+randomHero1 = Math.floor(Math.random() * 9);
+randomHero2 = Math.floor(Math.random() * 9);
+
 // Script pour animer les barres de progression
 document.addEventListener('DOMContentLoaded', function() {
   const statElements = document.querySelectorAll('.heroStats p');
