@@ -9,9 +9,11 @@ class CombatEngine {
   }
 
   // Damage formula: (stat × attackModifier) - (defenseStat × defenseModifier)
-  //nouvel formule: degats = Stat x Multiplicateur attaque - ((Stat / 2) + reduction de defense)
+  //degats = Stat x Multiplicateur attaque - ((Stat / 2) + reduction de defense)
+
   calculateDamage(attackerStat, attackModifier, defenderStat, defenseModifier) {
-    const damage = (attackerStat * attackModifier) - ((defenderStat/2)+ defenseModifier);
+    const damage = (attackerStat * attackModifier) - ((defenderStat/2) + defenseModifier);
+    console.log(`Calcul des dégâts : (${attackerStat} * ${attackModifier}) - (${defenderStat} * ${defenseModifier}) = ${damage}`);
     return Math.max(0, Math.floor(damage)); // No negative damage, integer values
   }
 
@@ -104,4 +106,4 @@ class CombatEngine {
   }
 }
 
-module.exports = CombatEngine;
+module.exports = CombatEngine; 
