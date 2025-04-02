@@ -9,7 +9,7 @@ class Superhero {
   }
 
   static getAll(callback) {
-    const sql = 'SELECT * FROM superheroes';
+    const sql = 'SELECT * FROM SuperHeroes';
     db.all(sql, [], (err, rows) => {
       if (err) {
         callback(err, null);
@@ -21,7 +21,7 @@ class Superhero {
   }
 
   static getById(id, callback) {
-    const sql = 'SELECT * FROM superheroes WHERE id = ?';
+    const sql = 'SELECT * FROM SuperHeroes WHERE id = ?';
     db.get(sql, [id], (err, row) => {
       if (err) {
         callback(err, null);
@@ -35,7 +35,7 @@ class Superhero {
   }
 
   static getPowerstats(id, callback) {
-    const sql = 'SELECT * FROM powerstats WHERE superhero_id = ?';
+    const sql = 'SELECT * FROM PowerStats WHERE superhero_id = ?';
     db.get(sql, [id], (err, row) => {
       if (err) {
         callback(err, null);
@@ -56,7 +56,7 @@ class Superhero {
   }
 
   static getImage(id, callback) {
-    const sql = 'SELECT * FROM images WHERE id = ?';
+    const sql = 'SELECT * FROM Images WHERE id = ?';
     db.get(sql, [id], (err, row) => {
       if (err) {
         callback(err, null);
@@ -70,7 +70,7 @@ class Superhero {
     });
   }
   static getRandomPair(callback) {
-    const sql = 'SELECT * FROM superheroes ORDER BY RANDOM() LIMIT 2';
+    const sql = 'SELECT * FROM SuperHeroes ORDER BY RANDOM() LIMIT 2';
     db.all(sql, [], (err, rows) => {
       if (err) {
         callback(err, null);
