@@ -64,15 +64,12 @@ class CombatEngine {
   processTurn(attacker, defender, attackIndex, defenseIndex) {
     const attack = attacker.attacks[attackIndex];
     const defense = defender.defenses[defenseIndex];
-
-    // 1. Validate attack
-    if (!this.validateAttack(attacker.id, attack.name)) {
-      throw new Error(`Cannot use ${attack.name} three times consecutively`);
-    }
-
+    const typeAttack = attacker.attacks[attackIndex].baseStat;
+    const typeDefense = defender.defenses[defenseIndex].baseStat;
+    
     // 2. Calculate stats
-    const attackerStat = attacker.superhero.powerstats.intelligence;
-    const defenderStat = defender.superhero.powerstats.intelligence;
+    const attackerStat = attacker.superhero.powerstats[typeAttack];
+    const defenderStat = defender.superhero.powerstats[typeDefense];
 
     // 3. Calculate damage
     const damage = this.calculateDamage(
