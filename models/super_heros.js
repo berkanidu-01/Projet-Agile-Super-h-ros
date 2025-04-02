@@ -11,7 +11,7 @@ class Superhero {
 
   // Charger les powerstats pour un super-héros
   loadPowerstats(callback) {
-    const sql = 'SELECT * FROM powerstats WHERE superhero_id = ?';
+    const sql = 'SELECT * FROM powerstats WHERE hero_id = ?';
     db.get(sql, [this.id], (err, row) => {
       if (err) {
         callback(err, null);
@@ -62,7 +62,7 @@ class Superhero {
 
   // Récupérer un super-héros par ID avec ses powerstats
   static getByIdWithPowerstats(id, callback) {
-    const sql = 'SELECT * FROM SuperHeroes WHERE id = ?';
+    const sql = 'SELECT * FROM SuperHeros WHERE id = ?';
     db.get(sql, [id], (err, row) => {
       if (err) {
         callback(err, null);

@@ -1,109 +1,103 @@
-// combat_engine.js
-
-const Attack = require('./models/attacks');
+// combatengine.js
 const Superhero = require('./models/super_heros');
+const Attack = require('./models/attacks');
 const Defense = require('./models/defenses');
-
 
 class CombatEngine {
   constructor() {
-    // No attack history required in this version.
+    this.attackHistory = new Map(); // Tracks consecutive attacks: { playerId: [lastTwoAttacks] }
   }
 
-  // Calculate damage using: stat × modifier - (defenseReduction × defenseModifier)
-  calculateDamage(usedStat, modifier, defenseReduction, defenseModifier) {
-    const rawDamage = (usedStat * modifier) - (defenseReduction * defenseModifier);
-    return Math.max(0, rawDamage); // Damage cannot be negative.
+  // Damage formula: (stat × attackModifier) - (defenseStat × defenseModifier)
+  calculateDamage(attackerStat, attackModifier, defenderStat, defenseModifier) {
+    const damage = (attackerStat * attackModifier) - (defenderStat * defenseModifier);
+    return Math.max(0, Math.floor(damage)); // No negative damage, integer values
   }
 
-  // Get 4 random attacks from the list of available attacks imported from API.js
-  getRandomAttacks(callback) {
+  // Random champion selection
+  pickRandomChampion(maxChampionId, callback) {
+    const randomId = Math.floor(Math.random() * maxChampionId) + 1;
+    Superhero.getByIdWithPowerstats(randomId, (err, champion) => {
+      if (err || !champion) {
+        callback(err || new Error('Champion not found'), null);
+      
+    }});
+  }
+
+  // Random attacks (4/13)
+  pickRandomAttacks(callback) {
     Attack.getAll((err, attacks) => {
-      if (err) return callback(err, null);
-      if (attacks.length < 4) return callback(new Error("Not enough attacks available"), null);
-
-      const availableAttacks = [];
-      const attacksCopy = [...attacks];
-      for (let i = 0; i < 4; i++) {
-        const randomIndex = Math.floor(Math.random() * attacksCopy.length);
-        availableAttacks.push(attacksCopy[randomIndex]);
-        attacksCopy.splice(randomIndex, 1);
+      if (err || attacks.length < 4) {
+        callback(err || new Error('Not enough attacks'), null);
+      } else {
+        const shuffled = [...attacks].sort(() => 0.5 - Math.random());
+        callback(null, shuffled.slice(0, 4));
       }
-      callback(null, availableAttacks);
     });
+  }
+
+  // Random defenses (4 from pool)
+  pickRandomDefenses(callback) {
+    Defense.getAll((err, defenses) => {
+      if (err || defenses.length < 4) {
+        callback(err || new Error('Not enough defenses'), null);
+      } else {
+        const shuffled = [...defenses].sort(() => 0.5 - Math.random());
+        callback(null, shuffled.slice(0, 4));
+      }
+    });
+  }
+
+  // Validate attack sequence (max 2 consecutive)
+  validateAttack(playerId, attackName) {
+    const history = this.attackHistory.get(playerId) || [];
+    return !(history.length >= 2 && history.every(a => a === attackName));
   }
 
   // Process a combat turn
-  processTurn(attacker, defender, attackUsed, defenseUsed) {
-    // Calculate damage using the defense_modifier from API.js
+  processTurn(attacker, defender, attackIndex, defenseIndex) {
+    const attack = attacker.attacks[attackIndex];
+    const defense = defender.defenses[defenseIndex];
+
+    // 1. Validate attack
+    if (!this.validateAttack(attacker.id, attack.name)) {
+      throw new Error(`Cannot use ${attack.name} three times consecutively`);
+    }
+
+    // 2. Calculate stats
+    const attackerStat = attacker.superhero.powerstats[attack.baseStat];
+    const defenderStat = defender.superhero.powerstats[defense.baseStat];
+
+    // 3. Calculate damage
     const damage = this.calculateDamage(
-      attackUsed.baseStat,
-      attackUsed.multiplicateur,
-      defenseUsed.baseStat,
-      defenseUsed.multiplicateur
+      attackerStat,
+      attack.multiplicateur,
+      defenderStat,
+      defense.multiplicateur
     );
 
-
-    // Update defender's HP ensuring it doesn't go below zero.
+    // 4. Apply damage
     defender.hp = Math.max(0, defender.hp - damage);
 
+    // 5. Update history
+    this.updateAttackHistory(attacker.id, attack.name);
+
     return {
-      damageDealt: damage,
+      damage,
       attacker: attacker.id,
       defenderHp: defender.hp,
-      attackUsed: attackUsed.type,
-      defenseUsed: defenseUsed.type,
-      isDefeated: defender.hp === 0
+      attackUsed: attack.name,
+      defenseUsed: defense.name,
+      isDefeated: defender.hp <= 0
     };
   }
-  startRandomCombat(callback) {
-    Superhero.getRandomPair((err, heroes) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        const [hero1, hero2] = heroes;
-        const combatDetails = {
-          hero1: hero1,
-          hero2: hero2,
-          message: `${hero1.name} affronte ${hero2.name} dans un combat épique !`
-        };
-        callback(null, combatDetails);
-      }
-    });
-  }
-  getRandomAttacks(callback) {
-    Attack.getAll((err, attacks) => {
-      if (err) return callback(err, null);
-      if (attacks.length < 4) return callback(new Error("Pas assez d'attaques disponibles"), null);
-  
-      const selectedAttacks = [];
-      const attacksCopy = [...attacks];
-      for (let i = 0; i < 4; i++) {
-        const randomIndex = Math.floor(Math.random() * attacksCopy.length);
-        selectedAttacks.push(attacksCopy[randomIndex]);
-        attacksCopy.splice(randomIndex, 1);
-      }
-      callback(null, selectedAttacks);
-    });
-  }
-  getRandomDefenses(callback) {
-    Defense.getAll((err, defenses) => {
-      if (err) return callback(err, null);
-      if (defenses.length < 4) return callback(new Error("Pas assez de défenses disponibles"), null);
-  
-      const selectedDefenses = [];
-      const defensesCopy = [...defenses];
-      for (let i = 0; i < 4; i++) {
-        const randomIndex = Math.floor(Math.random() * defensesCopy.length);
-        selectedDefenses.push(defensesCopy[randomIndex]);
-        defensesCopy.splice(randomIndex, 1);
-      }
-      callback(null, selectedDefenses);
-    });
-  }
-  // Reset combat state if needed (not used in this version)
-  resetCombat() {
-    // No state to reset in this version.
+
+  // Update attack history
+  updateAttackHistory(playerId, attackName) {
+    const history = this.attackHistory.get(playerId) || [];
+    history.push(attackName);
+    if (history.length > 2) history.shift();
+    this.attackHistory.set(playerId, history);
   }
 }
 
