@@ -26,9 +26,8 @@ class Superhero {
       if (err) {
         callback(err, null);
       } else if (!row) {
-        callback(null, null); // Aucun super-héros trouvé
+        callback(null, null); 
       } else {
-        // Transformer la ligne en une instance de Superhero
         const superhero = new Superhero(row.id, row.name, row.slug);
         callback(null, superhero);
       }
@@ -41,9 +40,8 @@ class Superhero {
       if (err) {
         callback(err, null);
       } else if (!row) {
-        callback(null, null); // Aucune statistique trouvée
+        callback(null, null); 
       } else {
-        // Retourner les statistiques sous forme d'objet
         const powerstats = {
           intelligence: row.intelligence,
           strength: row.strength,
@@ -53,6 +51,34 @@ class Superhero {
           combat: row.combat,
         };
         callback(null, powerstats);
+      }
+    });
+  }
+
+  static getImage(id, callback) {
+    const sql = 'SELECT * FROM images WHERE id = ?';
+    db.get(sql, [id], (err, row) => {
+      if (err) {
+        callback(err, null);
+      } else if (!row) {
+        callback(null, null); // Aucune image trouvée
+      } else {
+        // Retourner l'image
+        const image = row.sm;
+        callback(null, image);
+      }
+    });
+  }
+  static getRandomPair(callback) {
+    const sql = 'SELECT * FROM superheroes ORDER BY RANDOM() LIMIT 2';
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        callback(err, null);
+      } else if (rows.length < 2) {
+        callback(new Error('Pas assez de super-héros dans la base de données'), null);
+      } else {
+        const heroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
+        callback(null, heroes);
       }
     });
   }
