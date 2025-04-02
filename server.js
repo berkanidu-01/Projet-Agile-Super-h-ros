@@ -35,6 +35,7 @@ app.get('/api/superheroes/:id', (req, res) => {
   });
 });
 
+
 // Route pour récupérer les statistiques d'un super-héros par ID
 app.get('/api/superheroes/:id/powerstats', (req, res) => {
   const { id } = req.params;
