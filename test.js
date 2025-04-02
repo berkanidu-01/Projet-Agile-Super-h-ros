@@ -1,103 +1,126 @@
-// index.js
+const readline = require('readline');
 const CombatEngine = require('./combatengine');
 const Superhero = require('./models/super_heros');
-const readline = require('readline');
-
-// Helper to create a player object
-function createPlayer(id, hero, attacks, defenses) {
-  return {
-    id,
-    superhero: hero,
-    hp: 100,
-    attacks,
-    defenses
-  };
-}
 
 const combatEngine = new CombatEngine();
+
+// Interface pour lire les entrées utilisateur
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
-// Assume a maximum champion ID (e.g., 4 heroes available)
-const maxChampionId = 4;
-
-// Retrieve a random hero for each player using a custom function that wraps pickRandomChampion
-function getRandomHero(callback) {
-  // Instead of using pickRandomChampion (which requires a callback),
-  // we can simulate randomness with a simple random ID since dependencies are set.
-  const randomId = Math.floor(Math.random() * maxChampionId) + 1;
-  Superhero.getByIdWithPowerstats(randomId, callback);
+// Fonction pour poser une question à l'utilisateur
+function askQuestion(query, callback) {
+  rl.question(query, (answer) => callback(answer));
 }
 
-// Setup both players
-getRandomHero((err, hero1) => {
-  if (err) throw err;
-  getRandomHero((err, hero2) => {
-    if (err) throw err;
+// Configuration des joueurs avec leurs héros, attaques et défenses
+function setupPlayer(playerId, callback) {
+  console.log(`Configuration du joueur ${playerId}...`);
+  combatEngine.pickRandomChampion(532, (err, champion) => {
+    if (err) {
+      console.error(`Erreur lors de la sélection du champion pour le joueur ${playerId} :`, err);
+      process.exit(1);
+    }
 
-    // Get 4 random attacks and defenses for each player
-    combatEngine.pickRandomAttacks((err, attacks1) => {
-      if (err) throw err;
-      combatEngine.pickRandomDefenses((err, defenses1) => {
-        if (err) throw err;
-        combatEngine.pickRandomAttacks((err, attacks2) => {
-          if (err) throw err;
-          combatEngine.pickRandomDefenses((err, defenses2) => {
-            if (err) throw err;
+    combatEngine.pickRandomAttacks((err, attacks) => {
+      if (err) {
+        console.error(`Erreur lors de la sélection des attaques pour le joueur ${playerId} :`, err);
+        process.exit(1);
+      }
 
-            const player1 = createPlayer(1, hero1, attacks1, defenses1);
-            const player2 = createPlayer(2, hero2, attacks2, defenses2);
+      combatEngine.pickRandomDefenses((err, defenses) => {
+        if (err) {
+          console.error(`Erreur lors de la sélection des défenses pour le joueur ${playerId} :`, err);
+          process.exit(1);
+        }
 
-            console.log('Game Start!');
-            console.log(`Player 1: ${player1.superhero.name}`);
-            console.log(`Player 2: ${player2.superhero.name}`);
-            console.log(`\nPlayer 1 Attacks: ${player1.attacks.map((atk, i) => `[${i}] ${atk.name}`).join(', ')}`);
-            console.log(`Player 2 Attacks: ${player2.attacks.map((atk, i) => `[${i}] ${atk.name}`).join(', ')}`);
+        const player = {
+          id: playerId,
+          superhero: champion,
+          hp: 100,
+          attacks,
+          defenses,
+        };
 
-            let attacker = player1;
-            let defender = player2;
-            let turn = 1;
-
-            function nextTurn() {
-              if (defender.hp <= 0) {
-                console.log(`\nPlayer ${attacker.id} wins the battle!`);
-                rl.close();
-                return;
-              }
-              console.log(`\nTurn ${turn}: Player ${attacker.id} is attacking Player ${defender.id}`);
-              console.log(`Player ${attacker.id} HP: ${attacker.hp} | Player ${defender.id} HP: ${defender.hp}`);
-              console.log(`Available Attacks for Player ${attacker.id}:`);
-              attacker.attacks.forEach((atk, index) => {
-                console.log(`  [${index}]: ${atk.name}`);
-              });
-              rl.question(`Player ${attacker.id}, choose your attack index: `, (input) => {
-                let attackIndex = parseInt(input);
-                if (isNaN(attackIndex) || attackIndex < 0 || attackIndex >= attacker.attacks.length) {
-                  console.log('Invalid input. Defaulting to attack index 0.');
-                  attackIndex = 0;
-                }
-                // For this example, we'll pick a random defense index from the defender's defenses.
-                const defenseIndex = Math.floor(Math.random() * defender.defenses.length);
-                try {
-                  const result = combatEngine.processTurn(attacker, defender, attackIndex, defenseIndex);
-                  console.log(`\nPlayer ${attacker.id} used ${result.attackUsed} vs Player ${defender.id}'s ${result.defenseUsed}`);
-                  console.log(`Damage Dealt: ${result.damage}`);
-                  console.log(`Player ${defender.id}'s HP is now: ${result.defenderHp}`);
-                } catch (error) {
-                  console.log('Error processing turn:', error.message);
-                }
-                // Swap roles
-                [attacker, defender] = [defender, attacker];
-                turn++;
-                nextTurn();
-              });
-            }
-            nextTurn();
-          });
-        });
+        console.log(`Joueur ${playerId} configuré : ${champion.name}`);
+        callback(player);
       });
     });
   });
-});
+}
+
+// Boucle de jeu : les joueurs jouent à tour de rôle jusqu'à ce qu'un soit vaincu
+function gameLoop(player1, player2) {
+  let attacker = player1;
+  let defender = player2;
+
+  function nextTurn() {
+    if (player1.hp <= 0 || player2.hp <= 0) {
+      const winner = player1.hp > 0 ? player1 : player2;
+      console.log(`\nLe joueur ${winner.id} (${winner.superhero.name}) a gagné le combat !`);
+      rl.close();
+      return;
+    }
+
+    console.log(`\n--- Tour du joueur ${attacker.id} ---`);
+    console.log(`Champion : ${attacker.superhero.name}`);
+    console.log('Statistiques :', attacker.superhero.powerstats);
+    console.log('Attaques disponibles :');
+    attacker.attacks.forEach((atk, index) => {
+      console.log(`  ${index}: ${atk.name} (Stat de base : ${atk.baseStat}, Multiplicateur : ${atk.multiplicateur})`);
+    });
+
+    askQuestion(`Joueur ${attacker.id}, choisissez une attaque (0-${attacker.attacks.length - 1}) : `, (attackIndex) => {
+      attackIndex = parseInt(attackIndex, 10);
+      if (isNaN(attackIndex) || attackIndex < 0 || attackIndex >= attacker.attacks.length) {
+        console.log('Choix invalide. Attaque par défaut sélectionnée (index 0).');
+        attackIndex = 0;
+      }
+
+      const defenseIndex = Math.floor(Math.random() * defender.defenses.length);
+      const chosenDefense = defender.defenses[defenseIndex];
+
+      console.log(`Défense choisie pour le joueur ${defender.id} : ${chosenDefense.name} (Stat de base : ${chosenDefense.baseStat}, Multiplicateur : ${chosenDefense.multiplicateur})`);
+
+      try {
+        const result = combatEngine.processTurn(attacker, defender, attackIndex, defenseIndex);
+        console.log(`Le joueur ${attacker.id} utilise ${result.attackUsed} et inflige ${result.damage} dégâts !`);
+        console.log(`HP restants du joueur ${defender.id} : ${result.defenderHp}`);
+
+        if (result.isDefeated) {
+          console.log(`\nLe joueur ${defender.id} (${defender.superhero.name}) est vaincu !`);
+          console.log(`Le joueur ${attacker.id} (${attacker.superhero.name}) remporte le combat !`);
+          rl.close();
+          return;
+        }
+      } catch (err) {
+        console.error('Erreur pendant le tour :', err.message);
+      }
+
+      // Inverser les rôles pour le prochain tour
+      [attacker, defender] = [defender, attacker];
+      nextTurn();
+    });
+  }
+
+  nextTurn();
+}
+
+// Initialisation du jeu
+function startGame() {
+  console.log('Préparation des joueurs...');
+
+  setupPlayer(1, (player1) => {
+    setupPlayer(2, (player2) => {
+      console.log('\nLe combat commence !');
+      console.log(`Joueur 1 : ${player1.superhero.name} (HP : ${player1.hp})`);
+      console.log(`Joueur 2 : ${player2.superhero.name} (HP : ${player2.hp})`);
+
+      gameLoop(player1, player2);
+    });
+  });
+}
+
+startGame();
