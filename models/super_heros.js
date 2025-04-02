@@ -6,43 +6,21 @@ class Superhero {
     this.id = id;
     this.name = name;
     this.slug = slug;
+    this.powerstats = null; // Initialiser les powerstats à null
   }
 
-  static getAll(callback) {
-    const sql = 'SELECT * FROM superheroes';
-    db.all(sql, [], (err, rows) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        const superheroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
-        callback(null, superheroes);
-      }
-    });
-  }
-
-  static getById(id, callback) {
-    const sql = 'SELECT * FROM superheroes WHERE id = ?';
-    db.get(sql, [id], (err, row) => {
-      if (err) {
-        callback(err, null);
-      } else if (!row) {
-        callback(null, null); 
-      } else {
-        const superhero = new Superhero(row.id, row.name, row.slug);
-        callback(null, superhero);
-      }
-    });
-  }
-
-  static getPowerstats(id, callback) {
+  // Charger les powerstats pour un super-héros
+  loadPowerstats(callback) {
     const sql = 'SELECT * FROM powerstats WHERE superhero_id = ?';
-    db.get(sql, [id], (err, row) => {
+    db.get(sql, [this.id], (err, row) => {
       if (err) {
         callback(err, null);
       } else if (!row) {
-        callback(null, null); 
+        this.powerstats = null; // Aucun powerstats trouvé
+        callback(null, this);
       } else {
-        const powerstats = {
+        // Ajouter les powerstats à l'instance
+        this.powerstats = {
           intelligence: row.intelligence,
           strength: row.strength,
           speed: row.speed,
@@ -50,35 +28,55 @@ class Superhero {
           power: row.power,
           combat: row.combat,
         };
-        callback(null, powerstats);
+        callback(null, this);
       }
     });
   }
 
-  static getImage(id, callback) {
-    const sql = 'SELECT * FROM images WHERE id = ?';
+  // Récupérer tous les super-héros avec leurs powerstats
+  static getAllWithPowerstats(callback) {
+    const sql = 'SELECT * FROM superheroes';
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        const superheroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
+        let loadedCount = 0;
+
+        // Charger les powerstats pour chaque super-héros
+        superheroes.forEach(hero => {
+          hero.loadPowerstats((err) => {
+            if (err) {
+              callback(err, null);
+              return;
+            }
+            loadedCount++;
+            if (loadedCount === superheroes.length) {
+              callback(null, superheroes);
+            }
+          });
+        });
+      }
+    });
+  }
+
+  // Récupérer un super-héros par ID avec ses powerstats
+  static getByIdWithPowerstats(id, callback) {
+    const sql = 'SELECT * FROM superheroes WHERE id = ?';
     db.get(sql, [id], (err, row) => {
       if (err) {
         callback(err, null);
       } else if (!row) {
-        callback(null, null); // Aucune image trouvée
+        callback(null, null); // Aucun super-héros trouvé
       } else {
-        // Retourner l'image
-        const image = row.sm;
-        callback(null, image);
-      }
-    });
-  }
-  static getRandomPair(callback) {
-    const sql = 'SELECT * FROM superheroes ORDER BY RANDOM() LIMIT 2';
-    db.all(sql, [], (err, rows) => {
-      if (err) {
-        callback(err, null);
-      } else if (rows.length < 2) {
-        callback(new Error('Pas assez de super-héros dans la base de données'), null);
-      } else {
-        const heroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
-        callback(null, heroes);
+        const superhero = new Superhero(row.id, row.name, row.slug);
+        superhero.loadPowerstats((err) => {
+          if (err) {
+            callback(err, null);
+          } else {
+            callback(null, superhero);
+          }
+        });
       }
     });
   }

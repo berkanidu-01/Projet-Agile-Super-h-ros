@@ -23,7 +23,7 @@ app.get('/api/superheros', (req, res) => {
 // Route pour récupérer un super-héros par ID
 app.get('/api/superheroes/:id', (req, res) => {
   const { id } = req.params;
-  Superhero.getById(id, (err, superhero) => {
+  Superhero.getByIdWithPowerstats(id, (err, superhero) => {
     if (err) {
       console.error('Erreur lors de la récupération du super-héros :', err.message);
       res.status(500).send('Erreur serveur');
