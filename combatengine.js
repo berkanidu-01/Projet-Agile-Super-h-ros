@@ -11,17 +11,23 @@ class CombatEngine {
   // Damage formula: (stat × attackModifier) - (defenseStat × defenseModifier)
   calculateDamage(attackerStat, attackModifier, defenderStat, defenseModifier) {
     const damage = (attackerStat * attackModifier) - (defenderStat * defenseModifier);
+    console.log(`Calcul des dégâts : (${attackerStat} * ${attackModifier}) - (${defenderStat} * ${defenseModifier}) = ${damage}`);
     return Math.max(0, Math.floor(damage)); // No negative damage, integer values
   }
 
   // Random champion selection
   pickRandomChampion(maxChampionId, callback) {
     const randomId = Math.floor(Math.random() * maxChampionId) + 1;
+    console.log(`Tentative de sélection d'un champion avec l'ID : ${randomId}`);
     Superhero.getByIdWithPowerstats(randomId, (err, champion) => {
       if (err || !champion) {
+        console.error('Erreur lors de la récupération du champion :', err || 'Champion non trouvé');
         callback(err || new Error('Champion not found'), null);
-      
-    }});
+      } else {
+        console.log('Champion sélectionné :', champion);
+        callback(null, champion);
+      }
+    });
   }
 
   // Random attacks (4/13)
@@ -65,8 +71,8 @@ class CombatEngine {
     }
 
     // 2. Calculate stats
-    const attackerStat = attacker.superhero.powerstats[attack.baseStat];
-    const defenderStat = defender.superhero.powerstats[defense.baseStat];
+    const attackerStat = attacker.superhero.powerstats.intelligence;
+    const defenderStat = defender.superhero.powerstats.intelligence;
 
     // 3. Calculate damage
     const damage = this.calculateDamage(
