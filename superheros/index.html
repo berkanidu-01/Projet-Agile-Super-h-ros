@@ -19,8 +19,8 @@
           <img src="hero.jpg" alt="Hero Image" class="heroImg">
           <div class="heroStats">
             <h1 class="username">user1</h1>
-            <h2 class="heroName">hero</h2>
-            <p><strong>Intelligence:</strong> 10</p>
+            <h2 class="heroName">hero - HP: 1000</h2>
+            <p><strong>Intelligence:</strong>50</p>
             <p><strong>Force:</strong> 100</p>
             <p><strong>Vitesse:</strong> 70</p>
             <p><strong>Durabilité:</strong> 30</p>
@@ -34,7 +34,7 @@
           <img src="hero.jpg" alt="Hero Image" class="heroImg">
           <div class="heroStats">
             <h1 class="username">user2</h1>
-            <h2 class="heroName">hero</h2>
+            <h2 class="heroName">hero - HP: 100</h2>
             <p><strong>Intelligence:</strong> 10</p>
             <p><strong>Force:</strong> 100</p>
             <p><strong>Vitesse:</strong> 70</p>
@@ -45,30 +45,10 @@
         </div>
       </div>
     </div>
+	<!--<div class="card" id="moveCard">
+		<h1>Attaques</h1>
+	</div>-->
     
-    <script>
-      // Script pour animer les barres de progression
-      document.addEventListener('DOMContentLoaded', function() {
-        const statElements = document.querySelectorAll('.heroStats p');
-        
-        statElements.forEach(el => {
-          const statValue = parseInt(el.textContent.split(':')[1].trim());
-          const maxValue = 100;
-          const width = (statValue / maxValue) * 100;
-          
-          el.style.setProperty('--stat-width', width + '%');
-          el.addEventListener('mouseenter', function() {
-            el.style.setProperty('--stat-color', '#f72585');
-          });
-          
-          // Ajouter la barre de progression
-          el.style.position = 'relative';
-          el.style.paddingBottom = '10px';
-          el.insertAdjacentHTML('beforeend', 
-            `<div style="position: absolute; bottom: 0; left: 0; width: ${width}%; height: 4px; background: linear-gradient(90deg, #4cc9f0, #f72585); border-radius: 4px;"></div>`
-          );
-        });
-      });
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
