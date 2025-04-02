@@ -7,12 +7,16 @@ class Superhero {
     this.name = name;
     this.slug = slug;
     this.powerstats = null; // Initialiser les powerstats à null
+    this.image = null; // Initialiser l'image à null
   }
+  
 
   // Charger les powerstats pour un super-héros
   loadPowerstats(callback) {
-    const sql = 'SELECT * FROM powerstats WHERE hero_id = ?';
-    db.get(sql, [this.id], (err, row) => {
+    const sqlPowerstats = 'SELECT * FROM powerstats WHERE hero_id = ?';
+    const sqlImage = 'SELECT * FROM images WHERE hero_id = ?';
+  
+    db.get(sqlPowerstats, [this.id], (err, row) => {
       if (err) {
         callback(err, null);
       } else if (!row) {
@@ -28,7 +32,19 @@ class Superhero {
           power: row.power,
           combat: row.combat,
         };
-        callback(null, this);
+  
+        // Charger l'image
+        db.get(sqlImage, [this.id], (err, row) => {
+          if (err) {
+            callback(err, null);
+          } else if (!row) {
+            this.image = null; // Aucune image trouvée
+          } else {
+            console.log("ouistiit");
+            this.image = "https://cdn.jsdelivr.net/gh/rtomczak/superhero-api@0.3.0/api/images/" + row.url;
+          }
+          callback(null, this);
+        });
       }
     });
   }
