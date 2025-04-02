@@ -13,37 +13,6 @@ class Superhero {
   loadPowerstats(callback) {
     const sql = 'SELECT * FROM powerstats WHERE superhero_id = ?';
     db.get(sql, [this.id], (err, row) => {
-  }
-
-  static getAll(callback) {
-    const sql = 'SELECT * FROM SuperHeros';
-    db.all(sql, [], (err, rows) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        const superheroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
-        callback(null, superheroes);
-      }
-    });
-  }
-
-  static getById(id, callback) {
-    const sql = 'SELECT * FROM SuperHeroes WHERE id = ?';
-    db.get(sql, [id], (err, row) => {
-      if (err) {
-        callback(err, null);
-      } else if (!row) {
-        callback(null, null); 
-      } else {
-        const superhero = new Superhero(row.id, row.name, row.slug);
-        callback(null, superhero);
-      }
-    });
-  }
-
-  static getPowerstats(id, callback) {
-    const sql = 'SELECT * FROM PowerStats WHERE superhero_id = ?';
-    db.get(sql, [id], (err, row) => {
       if (err) {
         callback(err, null);
       } else if (!row) {
@@ -68,9 +37,6 @@ class Superhero {
   static getAllWithPowerstats(callback) {
     const sql = 'SELECT * FROM superheroes';
     db.all(sql, [], (err, rows) => {
-  static getImage(id, callback) {
-    const sql = 'SELECT * FROM Images WHERE id = ?';
-    db.get(sql, [id], (err, row) => {
       if (err) {
         callback(err, null);
       } else {
