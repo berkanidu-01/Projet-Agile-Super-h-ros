@@ -1,12 +1,15 @@
 // combat_engine.js
 
-const API = require('./API');
+const Attack = require('./models/attacks');
+const Superhero = require('./models/super_heros');
+const Defense = require('./models/defenses');
+
 
 class CombatEngine {
   constructor() {
     // No attack history required in this version.
   }
-  
+
   // Calculate damage using: stat × modifier - (defenseReduction × defenseModifier)
   calculateDamage(usedStat, modifier, defenseReduction, defenseModifier) {
     const rawDamage = (usedStat * modifier) - (defenseReduction * defenseModifier);
@@ -14,35 +17,32 @@ class CombatEngine {
   }
   
   // Get 4 random attacks from the list of available attacks imported from API.js
-  getRandomAttacks() {
-    const attacks = API.attacks;
-    if (!Array.isArray(attacks)) {
-      throw new Error("API.attacks must be an array");
-    }
-    if (attacks.length < 4) {
-      throw new Error("Not enough attacks available in API.attacks");
-    }
-    
-    // Randomly pick 4 unique attacks.
-    const availableAttacks = [];
-    const attacksCopy = [...attacks];
-    for (let i = 0; i < 4; i++) {
-      const randomIndex = Math.floor(Math.random() * attacksCopy.length);
-      availableAttacks.push(attacksCopy[randomIndex]);
-      attacksCopy.splice(randomIndex, 1); // Remove chosen attack to ensure uniqueness.
-    }
-    return availableAttacks;
-  }
+  getRandomAttacks(callback) {
+    Attack.getAll((err, attacks) => {
+      if (err) return callback(err, null);
+      if (attacks.length < 4) return callback(new Error("Not enough attacks available"), null);
   
+      const availableAttacks = [];
+      const attacksCopy = [...attacks];
+      for (let i = 0; i < 4; i++) {
+        const randomIndex = Math.floor(Math.random() * attacksCopy.length);
+        availableAttacks.push(attacksCopy[randomIndex]);
+        attacksCopy.splice(randomIndex, 1);
+      }
+      callback(null, availableAttacks);
+    });
+  }
+    
   // Process a combat turn
   processTurn(attacker, defender, attackUsed, defenseUsed) {
     // Calculate damage using the defense_modifier from API.js
     const damage = this.calculateDamage(
-      attackUsed.statValue,
-      attackUsed.modifier,
-      defenseUsed.defenseReduction,
-      API.defense_modifier
+      attackUsed.baseStat,
+      attackUsed.multiplicateur,
+      defenseUsed.baseStat,
+      defenseUsed.multiplicateur
     );
+    
     
     // Update defender's HP ensuring it doesn't go below zero.
     defender.hp = Math.max(0, defender.hp - damage);
