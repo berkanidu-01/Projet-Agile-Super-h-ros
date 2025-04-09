@@ -1,7 +1,7 @@
 const express = require('express');
-const Superhero = require('./models/super_heros'); // Import du modèle Superhero
-const Attack = require('./models/attacks'); // Import du modèle Attack
-const Defense = require('./models/defenses'); // Import du modèle Defense
+const Superhero = require('./models/super_heros'); 
+const Attack = require('./models/attacks'); 
+const Defense = require('./models/defenses'); 
 
 const app = express();
 const port = 3000;
@@ -23,7 +23,7 @@ app.get('/api/superheros', (req, res) => {
 // Route pour récupérer un super-héros par ID
 app.get('/api/superheroes/:id', (req, res) => {
   const { id } = req.params;
-  Superhero.getById(id, (err, superhero) => {
+  Superhero.getByIdWithPowerstats(id, (err, superhero) => {
     if (err) {
       console.error('Erreur lors de la récupération du super-héros :', err.message);
       res.status(500).send('Erreur serveur');
