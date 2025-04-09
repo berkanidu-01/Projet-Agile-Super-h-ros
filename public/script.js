@@ -29,7 +29,6 @@ const heroRightStatsEl = document.getElementById('heroRightStats');
 const moveButtonsContainer = document.getElementById('moveButtons');
 const turnIndicatorEl = document.getElementById('turnIndicator');
 
-
 // --- Core Functions ---
 
 // Initialise le combat
@@ -241,7 +240,9 @@ function activateUltraInstinct(heroId, heroData) {
 
     // Jouer le thème musical
     const audio = new Audio('ultra_instinct.mp3'); // Assurez-vous que ce fichier est dans le dossier public
+    audio.loop = false;
     audio.play();
+    
 
     // Afficher un message immédiatement
     updateActionDisplay(`${heroData.name} est passé en Ultra Instinct !`);
@@ -350,7 +351,72 @@ function updateActionDisplay(message) {
 }
 
 // --- Initialisation ---
-document.addEventListener('DOMContentLoaded', initCombat);
+document.addEventListener('DOMContentLoaded', () => {
+  const mainMenu = document.getElementById('mainMenu');
+  const charactersMenu = document.getElementById('charactersMenu');
+  const playButton = document.getElementById('playButton');
+  const charactersButton = document.getElementById('charactersButton');
+  const backToMenuButton = document.getElementById('backToMenuButton');
+  const charactersList = document.getElementById('charactersList');
 
-// Remove the old DOMContentLoaded listener that added bars directly to p tags
-// The new updateHeroUI handles stats rendering correctly.
+  // Afficher le menu principal
+  function showMainMenu() {
+    document.body.classList.add('menu-visible');
+    mainMenu.classList.remove('hidden');
+    charactersMenu.classList.add('hidden');
+    document.querySelector('.arena').style.display = 'none';
+  }
+
+  // Afficher le menu des personnages
+  function showCharactersMenu() {
+    document.body.classList.add('menu-visible');
+    mainMenu.classList.add('hidden');
+    charactersMenu.classList.remove('hidden');
+    loadCharacters();
+  }
+
+  // Lancer le jeu
+  function startGame() {
+    document.body.classList.remove('menu-visible');
+    mainMenu.classList.add('hidden');
+    document.querySelector('.arena').style.display = 'block';
+    initCombat();
+  }
+
+  // Charger les personnages
+  async function loadCharacters() {
+    charactersList.innerHTML = ''; // Clear previous characters
+    try {
+      const response = await fetch('/api/superheros');
+      const characters = await response.json();
+      characters.forEach(character => {
+        const card = document.createElement('div');
+        card.className = 'character-card';
+        card.innerHTML = `
+          <img src="${character.image || 'hero.jpg'}" alt="${character.name}">
+          <h3>${character.name}</h3>
+          <div class="stats-overlay">
+            <p>INT: ${character.powerstats.intelligence}</p>
+            <p>STR: ${character.powerstats.strength}</p>
+            <p>SPD: ${character.powerstats.speed}</p>
+            <p>DUR: ${character.powerstats.durability}</p>
+            <p>POW: ${character.powerstats.power}</p>
+            <p>COM: ${character.powerstats.combat}</p>
+          </div>
+        `;
+        charactersList.appendChild(card);
+      });
+    } catch (error) {
+      console.error('Erreur lors du chargement des personnages:', error);
+      charactersList.innerHTML = '<p>Impossible de charger les personnages.</p>';
+    }
+  }
+
+  // Ajouter les gestionnaires d'événements
+  playButton.addEventListener('click', startGame);
+  charactersButton.addEventListener('click', showCharactersMenu);
+  backToMenuButton.addEventListener('click', showMainMenu);
+
+  // Afficher le menu principal au démarrage
+  showMainMenu();
+});

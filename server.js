@@ -12,7 +12,7 @@ app.use(express.static('public'));
 
 // Récupère tous les super-héros
 app.get('/api/superheros', (req, res) => {
-  Superhero.getAll((err, superheroes) => {
+  Superhero.getAllWithPowerstats((err, superheroes) => {
     if (err) return res.status(500).send('Erreur serveur');
     res.send(superheroes);
   });

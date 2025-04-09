@@ -15,6 +15,22 @@
         <h1 class="site-title">Super<span>Heroes</span> Battle</h1>
     </header>
 
+    <div id="mainMenu" class="menu">
+        <h1 class="menu-title">SuperHeroes Battle</h1>
+        <div class="menu-buttons">
+            <button id="playButton" class="menu-btn">Jouer</button>
+            <button id="charactersButton" class="menu-btn">Personnages</button>
+        </div>
+    </div>
+
+    <div id="charactersMenu" class="menu hidden">
+        <h1 class="menu-title">Personnages</h1>
+        <div id="charactersList" class="characters-list">
+            <!-- Les personnages seront ajoutés dynamiquement ici -->
+        </div>
+        <button id="backToMenuButton" class="menu-btn">Retour</button>
+    </div>
+
     <div class="arena">
         <!-- Top HP Bars -->
         <div class="hp-bar left-hp" id="hpLeftContainer">

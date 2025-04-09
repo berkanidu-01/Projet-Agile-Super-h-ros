@@ -50,7 +50,7 @@ class Superhero {
 
   // Récupérer tous les super-héros avec leurs powerstats
   static getAllWithPowerstats(callback) {
-    const sql = 'SELECT * FROM superheroes';
+    const sql = 'SELECT * FROM SuperHeros';
     db.all(sql, [], (err, rows) => {
       if (err) {
         callback(err, null);
