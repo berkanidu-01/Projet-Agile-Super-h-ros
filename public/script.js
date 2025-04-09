@@ -19,22 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     );
   });
 
-  healthElements.forEach(healthEl => {
-    // Extract the HP value from the heroName text (e.g., "hero - HP: 1000")
-    const hpText = healthEl.textContent.match(/HP:\s*(\d+)/);
-    if (hpText) {
-      const hpValue = parseInt(hpText[1]);
-      const maxHP = 1000;
-      const hpWidth = (hpValue / maxHP) * 100;
-
-      // Ajouter la barre de progression pour les HP
-      healthEl.style.position = 'relative';
-      healthEl.style.paddingBottom = '10px';
-      healthEl.insertAdjacentHTML('beforeend', 
-        `<div style="position: absolute; bottom: 0; left: 0; width: ${hpWidth}%; height: 4px; background: linear-gradient(90deg, #4cc9f0, #f8961e); border-radius: 4px;"></div>`
-      );
-    }
-  });
+  animateHPBars(healthElements);
 });
 
 let combatData = null;
@@ -61,6 +46,65 @@ function updateHeroUI(heroId, heroData) {
   stats[3].textContent = `Durabilité: ${heroData.powerstats.durability}`;
   stats[4].textContent = `Puissance: ${heroData.powerstats.power}`;
   stats[5].textContent = `Combat: ${heroData.powerstats.combat}`;
+
+  // Animer les barres de progression
+  animateStatBars(stats, heroData.powerstats);
+  animateHPBars([heroElement.querySelector('.heroName')]);
+}
+
+// Fonction pour animer les barres de statistiques
+function animateStatBars(statElements, stats) {
+  statElements.forEach((el, index) => {
+    let statValue = 0;
+
+    switch (index) {
+      case 0: statValue = stats.intelligence || 0; break;
+      case 1: statValue = stats.strength || 0; break;
+      case 2: statValue = stats.speed || 0; break;
+      case 3: statValue = stats.durability || 0; break;
+      case 4: statValue = stats.power || 0; break;
+      case 5: statValue = stats.combat || 0; break;
+    }
+
+    const maxValue = 100;
+    const width = (statValue / maxValue) * 100;
+
+    // Supprimer l'ancienne barre si elle existe
+    const oldBar = el.querySelector('div');
+    if (oldBar) oldBar.remove();
+
+    // Ajouter la nouvelle barre
+    el.style.position = 'relative';
+    el.style.paddingBottom = '10px';
+    el.insertAdjacentHTML(
+      'beforeend',
+      `<div style="position: absolute; bottom: 0; left: 0; width: ${width}%; height: 4px; background: linear-gradient(90deg, #4cc9f0, #f72585); border-radius: 4px;"></div>`
+    );
+  });
+}
+
+// Fonction pour animer les barres de HP
+function animateHPBars(heroNameElements) {
+  heroNameElements.forEach(healthEl => {
+    const hpText = healthEl.textContent.match(/HP:\s*(\d+)/);
+    if (hpText) {
+      const hpValue = parseInt(hpText[1]);
+      const maxHP = 1000;
+      const hpWidth = (hpValue / maxHP) * 100;
+
+      // Supprimer l'ancienne barre si elle existe
+      const oldBar = healthEl.querySelector('div');
+      if (oldBar) oldBar.remove();
+
+      // Ajouter la nouvelle barre
+      healthEl.style.position = 'relative';
+      healthEl.style.paddingBottom = '10px';
+      healthEl.insertAdjacentHTML(
+        'beforeend',
+        `<div style="position: absolute; bottom: 0; left: 0; width: ${hpWidth}%; height: 4px; background: linear-gradient(90deg, #4cc9f0, #f8961e); border-radius: 4px;"></div>`
+      );
+    }
+  });
 }
 
 // Met à jour les boutons en fonction de la phase actuelle
