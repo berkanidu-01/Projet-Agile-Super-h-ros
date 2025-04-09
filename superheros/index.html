@@ -1,1 +1,88 @@
-ouistiti
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperHeroes Retro Battle</title>
+    <!-- Using the retro font from your style.css -->
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Removed header.css link as styles will be merged -->
+</head>
+<body class="crt-effect"> <!-- Added CRT effect -->
+    <header class="site-header">
+        <!-- Using the site-title style from retro style.css -->
+        <h1 class="site-title">Super<span>Heroes</span> Battle</h1>
+    </header>
+
+    <div class="arena">
+        <!-- Top HP Bars -->
+        <div class="hp-bar left-hp" id="hpLeftContainer">
+            <div class="hp-fill" id="hpLeftFill"></div>
+            <span class="hp-text" id="hpLeftText">P1 HP: 1000</span> <!-- Optional: Text on HP Bar -->
+        </div>
+        <div class="hp-bar right-hp" id="hpRightContainer">
+             <div class="hp-fill" id="hpRightFill"></div>
+             <span class="hp-text" id="hpRightText">P2 HP: 1000</span> <!-- Optional: Text on HP Bar -->
+        </div>
+
+        <!-- Fighters -->
+        <div class="fighters-container">
+            <div class="fighter-card" id="heroLeft">
+                <h3 class="username">Joueur 1</h3>
+                <h2 class="heroName" id="heroLeftName">Nom du héros</h2>
+                <img src="hero.jpg" alt="Hero 1 Sprite" class="fighter-sprite" id="heroLeftImg">
+                <div class="fighter-stats" id="heroLeftStats">
+                    <!-- Stats will be populated by JS, example structure: -->
+                    <!-- <div class="stat-row"><span>INT</span><div class="stat-bar"><div class="stat-fill" style="width: 80%;"></div></div></div> -->
+                </div>
+            </div>
+
+            <div class="fighter-card" id="heroRight">
+                <h3 class="username">Joueur 2</h3>
+                 <h2 class="heroName" id="heroRightName">Nom du héros</h2>
+                <img src="hero.jpg" alt="Hero 2 Sprite" class="fighter-sprite" id="heroRightImg">
+                <div class="fighter-stats" id="heroRightStats">
+                     <!-- Stats will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom UI: Moves and Turn Indicator -->
+        <div class="fight-ui">
+            <div class="moveset" id="moveButtons">
+                <!-- Buttons will be styled as fight-btn by JS/CSS -->
+                <button id="move1">Move 1</button>
+                <button id="move2">Move 2</button>
+                <button id="move3">Move 3</button>
+                <button id="move4">Move 4</button>
+            </div>
+            <div class="turn-display" id="turnIndicator">
+                LOADING...
+            </div>
+        </div>
+    </div>
+
+    <div id="combatHistory">
+        <div id="historyToggle">
+            <span>&#9664;</span> <!-- Flèche gauche -->
+        </div>
+        <div id="historyContent">
+            <h2>Historique du Combat</h2>
+            <ul id="historyList"></ul>
+        </div>
+    </div>
+
+    <div id="actionDisplay" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px; border-radius: 5px; font-size: 1.2rem; text-align: center; opacity: 0; transition: opacity 0.5s ease;"></div>
+
+    <div id="introGifContainer">
+        <img src="intro.gif" alt="Intro" id="introGif">
+    </div>
+
+    <div id="victoryGifContainer" style="display: none;">
+        <img src="victory.gif" alt="Victory" id="victoryGif">
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

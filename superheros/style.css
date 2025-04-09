@@ -1,0 +1,418 @@
+/* style.css - Retro Fighting Game Theme */
+body {
+    background: #1a1a1a; /* Dark background */
+    margin: 0;
+    overflow: hidden; /* Prevent scrollbars */
+    font-family: 'Press Start 2P', cursive; /* Pixel font */
+    color: #fff; /* Default text color */
+}
+
+/* Optional CRT Scanline Effect */
+.crt-effect {
+    position: relative;
+    /* Simple scanline overlay */
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 3px, 6px 100%; /* Adjust scanline thickness/spacing */
+    animation: scanlineAnim 0.1s linear infinite;
+}
+
+/* Muted scanline animation */
+@keyframes scanlineAnim {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 3px; } /* Adjust based on background-size */
+}
+
+
+/* --- Header Styles (Merged from header.css) --- */
+.site-header {
+    /* Using retro style colors */
+    background: #2a0f00; /* Dark brown/red */
+    padding: 0.8rem 1rem;
+    border-bottom: 4px solid #ff6b00; /* Orange border */
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    position: sticky; /* Keep header visible if body allowed scrolling */
+    top: 0;
+    z-index: 100;
+}
+
+.site-title {
+    color: #fff;
+    font-size: 1.8rem; /* Adjusted size for retro font */
+    text-shadow: 3px 3px 0 #ff6b00; /* Orange shadow */
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: normal; /* Press Start 2P is typically not bolded */
+}
+
+.site-title span {
+    color: #ffd700; /* Gold color for span */
+    text-shadow: 3px 3px 0 #c03000; /* Darker shadow for span */
+}
+/* --- End Header Styles --- */
+
+
+/* --- Arena and Layout --- */
+.arena {
+    position: relative;
+    padding: 1rem 2rem; /* Reduced padding */
+    height: calc(100vh - 80px); /* Adjust based on header height */
+    box-sizing: border-box; /* Include padding in height */
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- HP Bars --- */
+.hp-bar {
+    position: absolute;
+    height: 25px; /* Slightly thinner */
+    width: 40%; /* Adjust width */
+    border: 3px solid #fff;
+    background: #333; /* Dark grey background */
+    top: 75px; /* Position below header */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    z-index: 5; /* Below header, above fighters */
+}
+
+.left-hp {
+    left: 2rem;
+    border-right: none; /* Clean edge */
+}
+
+.right-hp {
+    right: 2rem;
+    border-left: none; /* Clean edge */
+    direction: rtl; /* Fill from the right */
+}
+
+.hp-fill {
+    height: 100%;
+    width: 100%; /* Default full */
+    background: linear-gradient(90deg, #ff0000, #ff6b00); /* Red to Orange gradient */
+    transition: width 0.3s ease-out; /* Smooth shrinking */
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+}
+
+.right-hp .hp-fill {
+     background: linear-gradient(-90deg, #ff0000, #ff6b00); /* Reversed gradient for right bar */
+}
+
+/* Optional HP Text */
+.hp-text {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    z-index: 6;
+    direction: ltr; /* Ensure text reads left-to-right */
+}
+.right-hp .hp-text {
+    right: 10px;
+    left: auto;
+    text-align: right;
+}
+
+
+/* Vibration animation on damage */
+.hp-bar.damage {
+    animation: vibrate 0.15s linear 3;
+}
+
+@keyframes vibrate {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(3px) rotate(0.5deg); }
+    50% { transform: translateX(0) rotate(0deg); }
+    75% { transform: translateX(-3px) rotate(-0.5deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+
+/* --- Fighters --- */
+.fighters-container {
+    display: flex;
+    /* Use space-between to push them to the sides, adjust arena padding if needed */
+    justify-content: space-between;
+    align-items: flex-end; /* Align at the bottom */
+    margin-top: 60px; /* Space below HP bars */
+    flex-grow: 1; /* Take remaining vertical space */
+    /* Increased padding-bottom to prevent overlap with bottom UI */
+    padding-bottom: 180px; /* More space needed if cards are taller */
+}
+
+.fighter-card {
+    /* *** INCREASED WIDTH *** */
+    width: 400px; /* Example: Increased from 300px */
+    background: rgba(0,0,0,0.6); /* Semi-transparent black */
+    border: 3px solid #888; /* Grey border */
+    padding: 0.8rem; /* Slightly increased padding */
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.fighter-sprite {
+    /* *** INCREASED SPRITE SIZE *** */
+    width: 220px; /* Example: Increased from 150px */
+    height: 260px; /* Example: Increased from 180px */
+    object-fit: cover; /* Cover the area */
+    object-position: center top; /* Focus on upper body */
+    border: 3px solid #fff; /* White border around sprite */
+    margin-bottom: 0.8rem; /* Increased margin */
+    background-color: #555; /* BG if image fails */
+    image-rendering: pixelated; /* Keep pixels sharp */
+}
+
+.fighter-stats {
+    background: rgba(0,0,0,0.7); /* Darker BG for stats */
+    padding: 0.8rem; /* Slightly increased padding */
+    margin-top: 0.8rem; /* Increased space */
+    border-top: 2px solid #888;
+}
+
+.username {
+    color: #ff6b00; /* Orange username */
+    font-size: 1rem; /* Slightly larger username */
+    margin: 0 0 0.4rem 0;
+    text-shadow: 1px 1px 0 #000;
+}
+.heroName {
+    color: #eee;
+    font-size: 1.1rem; /* Slightly larger hero name */
+    margin: 0 0 0.7rem 0; /* Increased margin */
+    text-shadow: 1px 1px 0 #000;
+    min-height: 1.2em; /* Prevent layout shift if name is short */
+}
+
+/* Stats Styling */
+.stat-row {
+    display: flex;
+    align-items: center;
+    margin: 0.4rem 0; /* Increased margin */
+    font-size: 0.8rem; /* Slightly larger font for stats */
+}
+
+.stat-row span {
+    color: #ccc; /* Lighter grey for stat name */
+    width: 40px; /* Slightly wider for maybe longer names */
+    text-align: left;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.stat-bar {
+    flex-grow: 1;
+    height: 12px; /* Slightly thicker bar */
+    background: #444; /* Dark background for bar */
+    border: 1px solid #fff; /* White border */
+    position: relative;
+    margin-left: 8px; /* Increased margin */
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+/* Using an inner div for the fill makes JS easier */
+.stat-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #4cc9f0, #f72585); /* Blue to Pink gradient */
+    width: 0%; /* Default empty, JS sets width */
+    transition: width 0.5s ease;
+    box-shadow: 0 0 3px #f72585; /* Glow effect */
+}
+
+
+/* --- Bottom UI (Moves/Turn) --- */
+.fight-ui {
+    position: absolute;
+    bottom: 10px;
+    left: 0; /* Align to left */
+    width: 100%;
+    padding: 0 2rem; /* Match arena padding */
+    box-sizing: border-box;
+    text-align: center;
+    z-index: 10;
+}
+
+.moveset {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 buttons */
+    gap: 0.8rem;
+    max-width: 650px; /* Slightly wider to accommodate text */
+    margin: 0 auto; /* Center the buttons */
+    background: rgba(0,0,0,0.5);
+    padding: 0.5rem;
+    border: 2px solid #888;
+    border-radius: 5px;
+}
+
+/* Style the buttons */
+#moveButtons button { /* Target buttons inside #moveButtons */
+    background: #4a2f10; /* Dark brown/red */
+    border: 2px solid #ff6b00; /* Orange border */
+    color: #fff;
+    padding: 0.8rem 0.5rem; /* Adjust padding */
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem; /* Slightly larger button text */
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 2px 2px 0px #803600; /* Simple shadow */
+    word-wrap: break-word; /* Wrap long move names */
+    min-height: 45px; /* Slightly taller */
+    line-height: 1.2;
+}
+
+#moveButtons button:hover {
+    background: #6a4f30; /* Lighter on hover */
+     box-shadow: 2px 2px 0px #b05000;
+}
+
+#moveButtons button:active {
+    transform: translate(2px, 2px); /* Push effect */
+    box-shadow: none; /* Remove shadow on click */
+    background: #ff6b00; /* Orange on click */
+}
+
+/* Turn Indicator Styling */
+.turn-display {
+    color: #ffd700; /* Gold color */
+    font-size: 1.2rem; /* Adjust size */
+    text-shadow: 2px 2px 0 #ff6b00; /* Orange shadow */
+    margin-top: 1rem; /* Space above indicator */
+    padding: 0.3rem;
+    background: rgba(0,0,0,0.6);
+    display: inline-block; /* Fit content width */
+    border: 2px solid #888;
+    border-radius: 3px;
+    /* Blinking animation */
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Panneau coulissant pour l'historique */
+#combatHistory {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 300px;
+  background-color: #16213e;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+#combatHistory:hover {
+  transform: translateX(0);
+}
+
+#historyToggle {
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  width: 30px;
+  height: 60px;
+  background-color: #f72585;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+}
+
+#historyContent {
+  padding: 20px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+#historyContent h2 {
+  color: #4cc9f0;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#historyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#historyList li {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #1a1a2e;
+  border-radius: 5px;
+  color: #e6e6e6;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  cursor: pointer;
+}
+
+#historyList li:hover .details {
+  display: block;
+}
+
+#historyList li .details {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #16213e;
+  color: #e6e6e6;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+#introGifContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+#introGif {
+    max-width: 80%;
+    max-height: 80%;
+    image-rendering: auto;
+}
+
+#victoryGifContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#victoryGif {
+    max-width: 80%;
+    max-height: 80%;
+}
