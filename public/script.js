@@ -33,13 +33,26 @@ async function initCombat() {
   updateHeroUI('heroRight', combatData.hero2);
   updateTurnIndicator();
   updateButtonsForPhase();
+
+  // Ajouter un événement de clic sur les images des héros
+  document.getElementById('heroLeft').querySelector('.heroImg').addEventListener('click', () => {
+    activateUltraInstinct('heroLeft', combatData.hero1);
+  });
+  document.getElementById('heroRight').querySelector('.heroImg').addEventListener('click', () => {
+    activateUltraInstinct('heroRight', combatData.hero2);
+  });
 }
 
 // Met à jour l'interface utilisateur pour un héros
 function updateHeroUI(heroId, heroData) {
   const heroElement = document.getElementById(heroId);
+
+  // Ne pas réinitialiser l'image si Goku est en Ultra Instinct
+  if (!heroData.isUltraInstinct) {
+    heroElement.querySelector('.heroImg').src = heroData.image || 'default-image.jpg';
+  }
+
   heroElement.querySelector('.heroName').textContent = `${heroData.name} - HP: ${heroData.hp}`;
-  heroElement.querySelector('.heroImg').src = heroData.image || 'default-image.jpg';
   const stats = heroElement.querySelectorAll('.heroStats p');
   stats[0].textContent = `Intelligence: ${heroData.powerstats.intelligence}`;
   stats[1].textContent = `Force: ${heroData.powerstats.strength}`;
@@ -108,6 +121,53 @@ function animateHPBars(heroNameElements) {
   });
 }
 
+// Fonction pour animer l'augmentation des statistiques
+function animateStatIncrease(statElements, stats, duration = 4000) {
+  statElements.forEach((el, index) => {
+    let statValue = 0;
+
+    switch (index) {
+      case 0: statValue = stats.intelligence || 0; break;
+      case 1: statValue = stats.strength || 0; break;
+      case 2: statValue = stats.speed || 0; break;
+      case 3: statValue = stats.durability || 0; break;
+      case 4: statValue = stats.power || 0; break;
+      case 5: statValue = stats.combat || 0; break;
+    }
+
+    const maxValue = 300;
+    const startValue = parseInt(el.textContent.split(':')[1].trim());
+    const increment = (statValue - startValue) / (duration / 50); // 50ms per frame
+
+    let currentValue = startValue;
+    let bar = el.querySelector('div');
+
+    // Si la barre n'existe pas, créez-la
+    if (!bar) {
+      el.style.position = 'relative';
+      el.style.paddingBottom = '10px';
+      el.insertAdjacentHTML(
+        'beforeend',
+        `<div style="position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background: linear-gradient(90deg, #4cc9f0, #f72585); border-radius: 4px;"></div>`
+      );
+      bar = el.querySelector('div');
+    }
+
+    const interval = setInterval(() => {
+      currentValue += increment;
+      if (currentValue >= statValue) {
+        currentValue = statValue;
+        clearInterval(interval);
+      }
+
+      // Mettre à jour le texte et la largeur de la barre
+      el.textContent = `${el.textContent.split(':')[0]}: ${Math.floor(currentValue)}`;
+      const width = (currentValue / maxValue) * 100;
+      bar.style.width = `${width}%`;
+    }, 50);
+  });
+}
+
 // Met à jour les boutons en fonction de la phase actuelle
 function updateButtonsForPhase() {
   const buttons = document.querySelectorAll('#moveButtons button');
@@ -164,7 +224,7 @@ async function playTurn(attackIndex, defenseIndex = null) {
 
     // Afficher l'action complète après la défense
     updateActionDisplay(
-      `${attackerName} a utilisé ${attackUsed} contre ${defenderName} (${defenseUsed}) et a infligé ${damage} dégâts. HP restants de ${defenderName} : ${defenderHp}`
+      `${defenderName} a utilisé ${attackUsed} ${attackerName} contre  (${defenseUsed}) et a infligé ${damage} dégâts. HP restants de ${attackerName} : ${defenderHp}`
     );
 
     addToHistory(turnCounter, attackerName, attackUsed, defenderName, defenseUsed, damage, defenderHp);
@@ -185,10 +245,10 @@ function addToHistory(turn, attacker, attackUsed, defender, defenseUsed, damage,
   listItem.innerHTML = `
     <strong>Tour ${turn}</strong>
     <div class="details">
-      <p><strong>${attacker}</strong> utilise <strong>${attackUsed}</strong></p>
-      <p><strong>${defender}</strong> utilise <strong>${defenseUsed}</strong></p>
+      <p><strong>${defender}</strong> utilise <strong>${attackUsed}</strong></p>
+      <p><strong>${attacker}</strong> utilise <strong>${defenseUsed}</strong></p>
       <p>Dégâts infligés : ${damage}</p>
-      <p>HP restants de ${defender} : ${defenderHp}</p>
+      <p>HP restants de ${attacker} : ${defenderHp}</p>
     </div>
   `;
   historyList.appendChild(listItem);
@@ -215,4 +275,47 @@ document.addEventListener('DOMContentLoaded', initCombat);
 function updateActionDisplay(message) {
   const actionDisplay = document.getElementById('actionDisplay');
   actionDisplay.textContent = message;
+}
+
+// Active le mode Ultra Instinct pour Goku
+function activateUltraInstinct(heroId, heroData) {
+  if (heroData.name.toLowerCase() === 'goku') {
+    // Marquer que Goku est en Ultra Instinct
+    heroData.isUltraInstinct = true;
+
+    // Jouer le thème musical
+    const audio = new Audio('ultra_instinct.mp3'); // Utiliser un fichier audio local
+    audio.play();
+
+    // Afficher un message immédiatement
+    updateActionDisplay(`${heroData.name} est passé en Ultra Drip ! +∞ Aura ?!`);
+
+    // Attendre 2 secondes avant de changer l'image et les statistiques
+    setTimeout(() => {
+      // Augmenter les statistiques à 300
+      heroData.powerstats = {
+        intelligence: 300,
+        strength: 300,
+        speed: 300,
+        durability: 300,
+        power: 300,
+        combat: 300,
+      };
+
+      // Changer l'image de Goku en Ultra Instinct avec un effet de fondu
+      const heroElement = document.getElementById(heroId);
+      const heroImg = heroElement.querySelector('.heroImg');
+      heroImg.style.transition = 'opacity 2s ease';
+      heroImg.style.opacity = 0;
+
+      setTimeout(() => {
+        heroImg.src = 'https://i.pinimg.com/736x/f1/50/68/f1506824eb8b77d75d3ae98c2557f617.jpg'; // Image de Goku Ultra Instinct
+        heroImg.style.opacity = 1;
+      }, 500); // Attendre 500ms avant de changer l'image
+
+      // Mettre à jour les barres de statistiques avec une animation
+      const stats = heroElement.querySelectorAll('.heroStats p');
+      animateStatIncrease(stats, heroData.powerstats);
+    }, 1000); // Attendre 2 secondes avant de changer l'image et les stats
+  }
 }
