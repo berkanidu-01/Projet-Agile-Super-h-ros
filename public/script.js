@@ -57,6 +57,26 @@ async function initCombat() {
   }
 }
 
+// Affiche le GIF d'intro au chargement
+const introContainer = document.getElementById('introGifContainer');
+if (introContainer) {
+
+    // Lancer l'audio
+    const introAudio = new Audio('fight_sfx.mp3');
+    introAudio.volume = 1;
+    introAudio.play().catch(err => {
+      console.warn("Lecture audio bloquée par le navigateur. Interaction utilisateur requise.", err);
+    });
+  
+    setTimeout(() => {
+    introContainer.style.opacity = '0';
+    setTimeout(() => {
+      introContainer.remove(); // Supprime le conteneur du DOM après la transition
+    }, 500); // Temps de la transition CSS
+  }, 950); // Durée d'affichage du GIF (ici 0.9 secondes)
+}
+
+
 // Met à jour l'interface utilisateur pour un héros (Left or Right)
 function updateHeroUI(heroSide, heroData) {
   const isLeft = heroSide === 'heroLeft';
@@ -204,8 +224,34 @@ async function playTurn(attackIndex, defenseIndex = null) {
   if (data.winner) {
     updateActionDisplay(`${data.winner} a gagné le combat !`);
     addToHistory(turnCounter, data.winner, "Victoire", "", "", 0, 0);
-    alert(`${data.winner} a gagné le combat !`);
-  }
+  
+    // Affiche le GIF de victoire
+    const victoryContainer = document.getElementById('victoryGifContainer');
+    if (victoryContainer) {
+      victoryContainer.style.display = 'flex';
+      victoryContainer.style.opacity = '1';
+  
+      // Lancer le son KO
+      const koAudio = new Audio('KO.mp3');
+      koAudio.volume = 1.0;
+      koAudio.play().catch(err => {
+        console.warn("Lecture audio KO bloquée par le navigateur.", err);
+      });
+
+      setTimeout(() => {
+        victoryContainer.style.opacity = '0';
+        setTimeout(() => {
+          victoryContainer.remove();
+        }, 500);
+      }, 3000); // Affiché pendant 3 secondes
+    }
+  
+    // Message final
+    setTimeout(() => {
+      alert(`${data.winner} a gagné le combat !`);
+    }, 500); // Décalé légèrement pour laisser le GIF s'afficher d'abord
+  }     
+
 }
 
 // Helper to disable/enable all move buttons
