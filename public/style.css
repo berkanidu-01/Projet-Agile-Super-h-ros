@@ -376,3 +376,142 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 10;
 }
+
+/* --- Bannière de cookies --- */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(26, 26, 42, 0.95);
+    border-top: 3px solid #ff6b00;
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.5s ease;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.cookie-banner.show {
+    transform: translateY(0);
+}
+
+.cookie-content {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cookie-content p {
+    margin: 0;
+    color: #eee;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    flex: 1 1 300px;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.cookie-btn {
+    padding: 8px 16px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    border: 2px solid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cookie-btn.accept {
+    background-color: #4a2f10;
+    border-color: #ff6b00;
+    color: #fff;
+    box-shadow: 2px 2px 0px #803600;
+}
+
+.cookie-btn.refuse {
+    background-color: #333;
+    border-color: #888;
+    color: #ddd;
+    box-shadow: 2px 2px 0px #555;
+}
+
+.cookie-btn:hover {
+    transform: translateY(-2px);
+}
+
+.cookie-btn:active {
+    transform: translateY(0);
+}
+
+/* --- Contrôleur Audio --- */
+.audio-controller {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background-color: rgba(26, 26, 42, 0.8);
+    border: 2px solid #ff6b00;
+    border-radius: 20px;
+    padding: 5px 10px;
+    z-index: 100;
+    transition: all 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.audio-controller.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.audio-btn {
+    background: none;
+    border: none;
+    color: #ff6b00;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 5px;
+    transition: transform 0.2s;
+}
+
+.audio-btn:hover {
+    transform: scale(1.1);
+}
+
+.volume-slider-container {
+    overflow: hidden;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.audio-controller:hover .volume-slider-container {
+    width: 80px;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 80px;
+    height: 5px;
+    background: #555;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #ff6b00;
+    border-radius: 50%;
+    cursor: pointer;
+}
