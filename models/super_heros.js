@@ -96,6 +96,35 @@ class Superhero {
       }
     });
   }
+
+  // Récupérer deux super-héros aléatoires avec leurs powerstats et images
+  static getRandomPair(callback) {
+    const sql = 'SELECT * FROM SuperHeros ORDER BY RANDOM() LIMIT 2';
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        callback(err, null);
+      } else if (rows.length < 2) {
+        callback(new Error('Pas assez de super-héros dans la base de données'), null);
+      } else {
+        const heroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
+        let loadedCount = 0;
+
+        // Charger les powerstats et images pour chaque super-héros
+        heroes.forEach(hero => {
+          hero.loadPowerstats((err) => {
+            if (err) {
+              callback(err, null);
+              return;
+            }
+            loadedCount++;
+            if (loadedCount === heroes.length) {
+              callback(null, heroes);
+            }
+          });
+        });
+      }
+    });
+  }
 }
 
 module.exports = Superhero;

@@ -36,10 +36,14 @@ class CombatEngine {
   pickRandomAttacks(callback) {
     Attack.getAll((err, attacks) => {
       if (err || attacks.length < 4) {
+        console.error('Erreur lors de la récupération des attaques ou pas assez d\'attaques disponibles :', err || 'Attaques insuffisantes');
         callback(err || new Error('Not enough attacks'), null);
       } else {
+        console.log('Attaques récupérées :', attacks);
         const shuffled = [...attacks].sort(() => 0.5 - Math.random());
-        callback(null, shuffled.slice(0, 4));
+        const selectedAttacks = shuffled.slice(0, 4);
+        console.log('Attaques sélectionnées :', selectedAttacks);
+        callback(null, selectedAttacks);
       }
     });
   }
@@ -64,16 +68,36 @@ class CombatEngine {
 
   // Process a combat turn
   processTurn(attacker, defender, attackIndex, defenseIndex) {
+    console.log('Attacker:', attacker);
+    console.log('Defender:', defender);
+
     const attack = attacker.attacks[attackIndex];
     const defense = defender.defenses[defenseIndex];
-    const typeAttack = attacker.attacks[attackIndex].baseStat;
-    const typeDefense = defender.defenses[defenseIndex].baseStat;
-    
-    // 2. Calculate stats
-    const attackerStat = attacker.superhero.powerstats[typeAttack];
-    const defenderStat = defender.superhero.powerstats[typeDefense];
+    const typeAttack = attack.baseStat;
+    const typeDefense = defense.baseStat;
 
-    // 3. Calculate damage
+    console.log('Attack:', attack);
+    console.log('Defense:', defense);
+
+    // Vérifier si les powerstats existent
+    if (!attacker.powerstats) {
+      throw new Error(`Les powerstats de l'attaquant sont manquants : ${JSON.stringify(attacker)}`);
+    }
+    if (!defender.powerstats) {
+      throw new Error(`Les powerstats du défenseur sont manquants : ${JSON.stringify(defender)}`);
+    }
+
+    // Vérifier si les baseStat sont valides
+    if (!attacker.powerstats[typeAttack]) {
+      throw new Error(`Statistique d'attaque invalide : ${typeAttack}`);
+    }
+    if (!defender.powerstats[typeDefense]) {
+      throw new Error(`Statistique de défense invalide : ${typeDefense}`);
+    }
+
+    const attackerStat = attacker.powerstats[typeAttack];
+    const defenderStat = defender.powerstats[typeDefense];
+
     const damage = this.calculateDamage(
       attackerStat,
       attack.multiplicateur,
@@ -81,10 +105,8 @@ class CombatEngine {
       defense.multiplicateur
     );
 
-    // 4. Apply damage
     defender.hp = Math.max(0, defender.hp - damage);
 
-    // 5. Update history
     this.updateAttackHistory(attacker.id, attack.name);
 
     return {
@@ -93,7 +115,7 @@ class CombatEngine {
       defenderHp: defender.hp,
       attackUsed: attack.name,
       defenseUsed: defense.name,
-      isDefeated: defender.hp <= 0
+      isDefeated: defender.hp <= 0,
     };
   }
 
@@ -106,4 +128,4 @@ class CombatEngine {
   }
 }
 
-module.exports = CombatEngine; 
+module.exports = CombatEngine;
