@@ -1,0 +1,152 @@
+/* Styles pour l'épée */
+.sword {
+    position: absolute;
+    width: 60px;
+    height: 10px;
+    background: linear-gradient(90deg, #c7c7c7, #e0e0e0);
+    border-radius: 2px;
+    transform-origin: center;
+    z-index: 10;
+    transition: transform 0.5s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+  }
+  
+  .sword::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -10px;
+    width: 20px;
+    height: 20px;
+    background: #b08d57;
+    border-radius: 4px;
+  }
+  
+  /* Animation du lancer d'épée */
+  .sword-throw {
+    transition: transform 0.5s ease;
+  }
+  
+  /* Styles pour le bouclier */
+  .shield {
+    position: absolute;
+    width: 40px;
+    height: 50px;
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    border: 3px solid #f8961e;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+    top: 50%;
+    left: -20px;
+    transform-origin: right center;
+    z-index: 5;
+    box-shadow: 0 0 15px rgba(67, 97, 238, 0.7);
+  }
+  
+  .shield-block {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  /* Effet d'impact */
+  .impact {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,215,0,0) 70%);
+    border-radius: 50%;
+    z-index: 20;
+    animation: impact 0.5s ease-out forwards;
+  }
+  
+  @keyframes impact {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+  
+  /* Effet de dégâts */
+  .damage {
+    animation: damage 0.3s ease-in-out;
+  }
+  
+  @keyframes damage {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    20%, 60% {
+      transform: translateX(-5px);
+    }
+    40%, 80% {
+      transform: translateX(5px);
+    }
+  }
+  
+  /* Styles pour les contrôles */
+  .controls {
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+  }
+  
+  #moveCard {
+    text-align: center;
+    padding: 15px;
+    width: 100%;
+  }
+  
+  #moveCard h2 {
+    color: #f72585;
+    margin-top: 0;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .attack-btn {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .attack-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #5a70ee, #4617b3);
+  }
+  
+  .attack-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Responsive design pour les contrôles */
+  @media (max-width: 600px) {
+    .buttons {
+      flex-direction: column;
+    }
+    
+    .attack-btn {
+      width: 80%;
+      margin: 5px auto;
+    }
+  }
