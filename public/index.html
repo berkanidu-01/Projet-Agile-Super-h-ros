@@ -1,64 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperHeroes</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="header.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <header class="site-header">
-      <h1 class="site-title">Super<span>Heroes</span> Battle</h1>
-    </header>
-    
-    <div id="heroContainer">
-      <div class="card" id="heroLeft">
-        <div class="heroRow">
-          <img src="hero.jpg" alt="Hero Image" class="heroImg">
-          <div class="heroStats">
-            <h1 class="username">Joueur 1</h1>
-            <h2 class="heroName">Nom du héros - HP: 1000</h2>
-            <p><strong>Intelligence:</strong> 0</p>
-            <p><strong>Force:</strong> 0</p>
-            <p><strong>Vitesse:</strong> 0</p>
-            <p><strong>Durabilité:</strong> 0</p>
-            <p><strong>Puissance:</strong> 0</p>
-            <p><strong>Combat:</strong> 0</p>
-          </div>
-        </div>
-      </div>
-      <div class="card" id="heroRight">
-        <div class="heroRow">
-          <img src="hero.jpg" alt="Hero Image" class="heroImg">
-          <div class="heroStats">
-            <h1 class="username">Joueur 2</h1>
-            <h2 class="heroName">Nom du héros - HP: 1000</h2>
-            <p><strong>Intelligence:</strong> 0</p>
-            <p><strong>Force:</strong> 0</p>
-            <p><strong>Vitesse:</strong> 0</p>
-            <p><strong>Durabilité:</strong> 0</p>
-            <p><strong>Puissance:</strong> 0</p>
-            <p><strong>Combat:</strong> 0</p>
-          </div>
-        </div>
-      </div>
-    </div>
-	<div class="movescard" id="movesCard">
-		<h1>Attaques</h1>
-		<div id="moveButtons">
-			<button id="move1"><strong>Attaque 1</strong></button>
-			<button id="move2"><strong>Attaque 2</strong></button>
-			<button id="move3"><strong>Attaque 3</strong></button>
-			<button id="move4"><strong>Attaque 4</strong></button>
-		</div>
-	</div>
 
-    <div id="turnIndicator" style="text-align: center; font-size: 1.5em; margin: 20px 0;">
-      C'est au tour de Joueur 1
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperHeroes</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="header.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <header class="site-header">
+    <h1 class="site-title">Super<span>Heroes</span> Battle</h1>
+  </header>
+
+  <div id="heroContainer">
+    <div class="card" id="heroLeft">
+      <div class="heroRow">
+        <img src="hero.jpg" alt="Hero Image" class="heroImg">
+        <div class="heroStats">
+          <h1 class="username">Joueur 1</h1>
+          <h2 class="heroName">Nom du héros - HP: 1000</h2>
+          <p><strong>Intelligence:</strong> 0</p>
+          <p><strong>Force:</strong> 0</p>
+          <p><strong>Vitesse:</strong> 0</p>
+          <p><strong>Durabilité:</strong> 0</p>
+          <p><strong>Puissance:</strong> 0</p>
+          <p><strong>Combat:</strong> 0</p>
+        </div>
+      </div>
     </div>
-    
-    <script src="script.js"></script>
-  </body>
+    <div class="card" id="heroRight">
+      <div class="heroRow">
+        <img src="hero.jpg" alt="Hero Image" class="heroImg">
+        <div class="heroStats">
+          <h1 class="username">Joueur 2</h1>
+          <h2 class="heroName">Nom du héros - HP: 1000</h2>
+          <p><strong>Intelligence:</strong> 0</p>
+          <p><strong>Force:</strong> 0</p>
+          <p><strong>Vitesse:</strong> 0</p>
+          <p><strong>Durabilité:</strong> 0</p>
+          <p><strong>Puissance:</strong> 0</p>
+          <p><strong>Combat:</strong> 0</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="actionDisplay"></div>
+  <div class="movescard" id="movesCard">
+    <h1>Attaques</h1>
+    <div id="moveButtons">
+      <button id="move1"><strong>Attaque 1</strong></button>
+      <button id="move2"><strong>Attaque 2</strong></button>
+      <button id="move3"><strong>Attaque 3</strong></button>
+      <button id="move4"><strong>Attaque 4</strong></button>
+    </div>
+  </div>
+
+  <div id="turnIndicator" style="text-align: center; font-size: 1.5em; margin: 20px 0;">
+    C'est au tour de Joueur 1
+  </div>
+
+  <div id="combatHistory">
+    <div id="historyToggle">
+      <span>&#9664;</span> <!-- Flèche gauche -->
+    </div>
+    <div id="historyContent">
+      <h2>Historique du Combat</h2>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
 </html>

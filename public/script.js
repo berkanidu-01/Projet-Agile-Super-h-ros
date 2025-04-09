@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 let combatData = null;
+let turnCounter = 1;
 
 // Initialiser le combat
 async function initCombat() {
@@ -113,6 +114,7 @@ function updateButtonsForPhase() {
   const isAttackPhase = combatData.currentPhase === 'attack';
   const currentHero = combatData.currentTurn === 'hero1' ? combatData.hero1 : combatData.hero2;
 
+  // Mettre à jour le texte des boutons
   buttons.forEach((button, index) => {
     button.textContent = isAttackPhase
       ? currentHero.attacks[index]?.name || 'Attaque indisponible'
@@ -120,6 +122,10 @@ function updateButtonsForPhase() {
     button.style.backgroundColor = isAttackPhase ? '#f72585' : '#4cc9f0';
     button.style.color = '#fff';
   });
+
+  // Mettre à jour le titre "Attaques" ou "Défenses"
+  const movesCardTitle = document.querySelector('#movesCard h1');
+  movesCardTitle.textContent = isAttackPhase ? 'Attaques' : 'Défenses';
 }
 
 // Met à jour l'indicateur de tour
@@ -130,6 +136,13 @@ function updateTurnIndicator() {
 
 // Gère un tour de combat
 async function playTurn(attackIndex, defenseIndex = null) {
+  // Si c'est la phase d'attaque, afficher l'attaque choisie immédiatement
+  if (combatData.currentPhase === 'attack' && attackIndex !== null) {
+    const attackerName = combatData[combatData.currentTurn].name;
+    const attackUsed = combatData[combatData.currentTurn].attacks[attackIndex].name;
+    updateActionDisplay(`${attackerName} a choisi ${attackUsed}`);
+  }
+
   const response = await fetch('/api/combat/turn', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -144,8 +157,44 @@ async function playTurn(attackIndex, defenseIndex = null) {
   updateTurnIndicator();
   updateButtonsForPhase();
 
-  if (data.message) alert(data.message);
-  if (data.winner) alert(`${data.winner} a gagné le combat !`);
+  if (data.result) {
+    const { attacker, attackUsed, defenderHp, defenseUsed, damage } = data.result;
+    const attackerName = combatData[combatData.currentTurn].name;
+    const defenderName = combatData[combatData.currentTurn === 'hero1' ? 'hero2' : 'hero1'].name;
+
+    // Afficher l'action complète après la défense
+    updateActionDisplay(
+      `${attackerName} a utilisé ${attackUsed} contre ${defenderName} (${defenseUsed}) et a infligé ${damage} dégâts. HP restants de ${defenderName} : ${defenderHp}`
+    );
+
+    addToHistory(turnCounter, attackerName, attackUsed, defenderName, defenseUsed, damage, defenderHp);
+    turnCounter++;
+  }
+
+  if (data.winner) {
+    updateActionDisplay(`${data.winner} a gagné le combat !`);
+    addToHistory(turnCounter, data.winner, "Victoire", "", "", 0, 0);
+    alert(`${data.winner} a gagné le combat !`);
+  }
+}
+
+// Fonction pour ajouter un message à l'historique
+function addToHistory(turn, attacker, attackUsed, defender, defenseUsed, damage, defenderHp) {
+  const historyList = document.getElementById('historyList');
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `
+    <strong>Tour ${turn}</strong>
+    <div class="details">
+      <p><strong>${attacker}</strong> utilise <strong>${attackUsed}</strong></p>
+      <p><strong>${defender}</strong> utilise <strong>${defenseUsed}</strong></p>
+      <p>Dégâts infligés : ${damage}</p>
+      <p>HP restants de ${defender} : ${defenderHp}</p>
+    </div>
+  `;
+  historyList.appendChild(listItem);
+
+  // Faire défiler automatiquement vers le bas
+  historyList.scrollTop = historyList.scrollHeight;
 }
 
 // Gère les clics sur les boutons
@@ -161,3 +210,9 @@ document.querySelectorAll('#moveButtons button').forEach((button, index) => {
 
 // Initialise le combat au chargement de la page
 document.addEventListener('DOMContentLoaded', initCombat);
+
+// Met à jour l'affichage des actions
+function updateActionDisplay(message) {
+  const actionDisplay = document.getElementById('actionDisplay');
+  actionDisplay.textContent = message;
+}

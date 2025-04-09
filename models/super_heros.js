@@ -40,7 +40,6 @@ class Superhero {
           } else if (!row) {
             this.image = null; // Aucune image trouvée
           } else {
-            console.log("ouistiit");
             this.image = "https://cdn.jsdelivr.net/gh/rtomczak/superhero-api@0.3.0/api/images/" + row.url;
           }
           callback(null, this);
