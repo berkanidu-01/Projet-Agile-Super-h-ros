@@ -1,6 +1,6 @@
 const readline = require('readline');
 const CombatEngine = require('./combatengine');
-const Superhero = require('./models/super_heros');
+const Superhero = require('../models/super_heros');
 
 const combatEngine = new CombatEngine();
 

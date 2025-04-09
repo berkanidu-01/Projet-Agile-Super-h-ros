@@ -1,6 +1,6 @@
 const readline = require('readline');
 const CombatEngine = require('./combatengine');
-const Superhero = require('./models/super_heros');
+const Superhero = require('../models/super_heros');
 
 const combatEngine = new CombatEngine();
 
@@ -28,7 +28,7 @@ async function playCombat() {
     }
 
     const [hero1, hero2] = heroes;
-    hero1.hp = 100; // Initialiser les points de vie
+    hero1.hp = 100;
     hero2.hp = 100;
 
     console.log(`Combat entre ${hero1.name} et ${hero2.name} commence !`);
@@ -46,13 +46,11 @@ async function playCombat() {
           combatEngine.getRandomDefenses(async (err, hero2Defenses) => {
             if (err) return console.error("Erreur lors de la récupération des défenses pour Hero 2 :", err);
 
-            // Afficher les choix d'attaques et défenses
             console.log(`${hero1.name} a les attaques :`, hero1Attacks.map((a, i) => `${i + 1}: ${a.name}`));
             console.log(`${hero1.name} a les défenses :`, hero1Defenses.map((d, i) => `${i + 1}: ${d.name}`));
             console.log(`${hero2.name} a les attaques :`, hero2Attacks.map((a, i) => `${i + 1}: ${a.name}`));
             console.log(`${hero2.name} a les défenses :`, hero2Defenses.map((d, i) => `${i + 1}: ${d.name}`));
 
-            // Boucle de combat
             let turn = 1;
             while (hero1.hp > 0 && hero2.hp > 0) {
               console.log(`\n--- Tour ${turn} ---`);

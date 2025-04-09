@@ -1,7 +1,7 @@
 // combatengine.js
-const Superhero = require('./models/super_heros');
-const Attack = require('./models/attacks');
-const Defense = require('./models/defenses');
+const Superhero = require('../models/super_heros');
+const Attack = require('../models/attacks');
+const Defense = require('../models/defenses');
 
 class CombatEngine {
   constructor() {

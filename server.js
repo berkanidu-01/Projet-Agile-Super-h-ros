@@ -1,7 +1,7 @@
 const express = require('express');
-const Superhero = require('./models/super_heros'); // Import du modèle Superhero
-const Attack = require('./models/attacks'); // Import du modèle Attack
-const Defense = require('./models/defenses'); // Import du modèle Defense
+const Superhero = require('./models/super_heros'); 
+const Attack = require('./models/attacks'); 
+const Defense = require('./models/defenses'); 
 
 const app = express();
 const port = 3000;
