@@ -11,6 +11,11 @@ let combatData = null;
 let previousHp = { hero1: MAX_HP, hero2: MAX_HP }; // Store previous HP for damage animation
 let turnCounter = 1; // Track the number of turns
 
+// Variables globales pour l'audio
+let youtubePlayer = null;
+let isMusicPlaying = false;
+let cookiesAccepted = false;
+
 // --- DOM Elements ---
 const hpLeftFill = document.getElementById('hpLeftFill');
 const hpRightFill = document.getElementById('hpRightFill');
@@ -28,6 +33,213 @@ const heroRightStatsEl = document.getElementById('heroRightStats');
 
 const moveButtonsContainer = document.getElementById('moveButtons');
 const turnIndicatorEl = document.getElementById('turnIndicator');
+
+// Fonction pour vérifier si les cookies ont été acceptés
+function checkCookieConsent() {
+  const cookieConsent = localStorage.getItem('cookieConsent');
+  if (cookieConsent === 'accepted') {
+    cookiesAccepted = true;
+    return true;
+  } else if (cookieConsent === 'refused') {
+    cookiesAccepted = false;
+    return true;
+  }
+  return false;
+}
+
+// Afficher la bannière de cookies si nécessaire
+function showCookieBanner() {
+  const mainMenu = document.getElementById('mainMenu');
+  const cookieBanner = document.getElementById('cookieBanner');
+
+  // Vérifier si les cookies ont déjà été acceptés ou refusés
+  if (!checkCookieConsent() && mainMenu && !mainMenu.classList.contains('hidden')) {
+    cookieBanner.classList.add('show');
+  } else if (cookiesAccepted) {
+    // Initialiser l'audio si les cookies sont déjà acceptés
+    initAudio();
+  }
+}
+
+// Fonction pour vérifier si l'API YouTube est prête
+function checkYouTubeApiReady() {
+  console.log('Vérification de l\'API YouTube...');
+  if (typeof YT !== 'undefined' && YT.Player) {
+    console.log('API YouTube disponible');
+    return true;
+  }
+  console.log('API YouTube pas encore disponible');
+  return false;
+}
+
+// Fonction globale appelée par l'API YouTube quand elle est prête
+function onYouTubeIframeAPIReady() {
+  console.log('API YouTube iframe prête');
+  if (cookiesAccepted) {
+    initAudio();
+  }
+}
+
+// Initialiser le lecteur YouTube
+function initAudio() {
+  if (cookiesAccepted && !youtubePlayer) {
+    console.log('Initialisation de l\'audio...');
+    const audioController = document.getElementById('audioController');
+    audioController.classList.add('show');
+    
+    // Vérifier si l'API YouTube est chargée
+    if (!checkYouTubeApiReady()) {
+      console.error('L\'API YouTube n\'est pas chargée correctement');
+      // Réessayer après un court délai
+      setTimeout(initAudio, 1000);
+      return;
+    }
+    
+    // Créer un élément div pour le player YouTube (caché)
+    const playerContainer = document.createElement('div');
+    playerContainer.id = 'youtubePlayerContainer';
+    document.body.appendChild(playerContainer);
+    
+    const playerDiv = document.createElement('div');
+    playerDiv.id = 'youtubePlayer';
+    playerDiv.style.position = 'absolute';
+    playerDiv.style.top = '-9999px';
+    playerDiv.style.left = '-9999px';
+    playerContainer.appendChild(playerDiv);
+    
+    try {
+      console.log('Création du player YouTube...');
+      // Initialiser le player YouTube
+      youtubePlayer = new YT.Player('youtubePlayer', {
+        height: '0',
+        width: '0',
+        videoId: '_gEcossfP38', // ID de la vidéo Ultra Instinct Theme
+        playerVars: {
+          'autoplay': 0,
+          'controls': 0,
+          'disablekb': 1,
+          'playsinline': 1,
+          'rel': 0,
+          'showinfo': 0,
+          'modestbranding': 1,
+          'origin': window.location.origin
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          'onError': (e) => console.error('Erreur YouTube:', e)
+        }
+      });
+      console.log('Player YouTube créé');
+    } catch (error) {
+      console.error('Erreur lors de la création du player YouTube:', error);
+    }
+  }
+}
+
+// Appelé quand le player est prêt
+function onPlayerReady(event) {
+  console.log('YouTube Player prêt');
+  // Préparer le player mais ne pas jouer automatiquement
+  event.target.setVolume(50);
+  updateAudioIcon();
+}
+
+// Gérer les changements d'état du player
+function onPlayerStateChange(event) {
+  console.log('État du player YouTube changé:', event.data);
+  if (event.data === YT.PlayerState.ENDED) {
+    // Rejouer la vidéo quand elle se termine
+    event.target.playVideo();
+  } else if (event.data === YT.PlayerState.PLAYING) {
+    isMusicPlaying = true;
+    updateAudioIcon();
+  } else if (event.data === YT.PlayerState.PAUSED) {
+    isMusicPlaying = false;
+    updateAudioIcon();
+  }
+}
+
+// Basculer la lecture audio
+function toggleAudio() {
+  console.log('Bouton audio cliqué');
+  if (!youtubePlayer) {
+    console.error('Le player YouTube n\'est pas initialisé');
+    return;
+  }
+  
+  console.log('État actuel de la lecture:', isMusicPlaying);
+  if (isMusicPlaying) {
+    console.log('Pause de la vidéo');
+    youtubePlayer.pauseVideo();
+    isMusicPlaying = false;
+  } else {
+    console.log('Lecture de la vidéo');
+    youtubePlayer.playVideo();
+    isMusicPlaying = true;
+  }
+  
+  updateAudioIcon();
+}
+
+// Gérer le changement de volume
+function handleVolumeChange(e) {
+  if (!youtubePlayer) return;
+  
+  const volume = e.target.value;
+  youtubePlayer.setVolume(volume);
+}
+
+// Mettre à jour l'icône audio
+function updateAudioIcon() {
+  const audioIcon = document.getElementById('audioIcon');
+  if (isMusicPlaying) {
+    audioIcon.textContent = '🔊';
+  } else {
+    audioIcon.textContent = '🔇';
+  }
+}
+
+// Fonction pour mettre en pause temporairement la musique YouTube
+function pauseYouTubeTemporarily(duration = 4000) {
+  if (!youtubePlayer) {
+    console.log('Player YouTube non initialisé');
+    return;
+  }
+  
+  console.log('Pause temporaire de la musique YouTube');
+  if (isMusicPlaying) {
+    // Sauvegarder l'état actuel
+    const wasPlaying = true;
+    let currentVolume = 50;
+    
+    try {
+      currentVolume = youtubePlayer.getVolume();
+    } catch (error) {
+      console.error('Erreur lors de la récupération du volume:', error);
+    }
+    
+    // Mettre en pause la vidéo
+    try {
+      youtubePlayer.pauseVideo();
+      isMusicPlaying = false;
+      updateAudioIcon();
+      
+      // Réactiver après la durée spécifiée
+      setTimeout(() => {
+        console.log('Reprise de la musique après pause temporaire');
+        if (wasPlaying) {
+          youtubePlayer.playVideo();
+          youtubePlayer.setVolume(currentVolume);
+          isMusicPlaying = true;
+          updateAudioIcon();
+        }
+      }, duration);
+    } catch (error) {
+      console.error('Erreur lors de la pause de la vidéo:', error);
+    }
+  }
+}
 
 // --- Core Functions ---
 
@@ -238,16 +450,20 @@ function activateUltraInstinct(heroId, heroData) {
     // Marquer que Goku est en Ultra Instinct
     heroData.isUltraInstinct = true;
 
-    // Jouer le thème musical
-    const audio = new Audio('ultra_instinct.mp3'); // Assurez-vous que ce fichier est dans le dossier public
+    // Mettre en pause temporairement la musique YouTube
+    pauseYouTubeTemporarily(4000);
+
+    // Jouer le thème musical d'ultra instinct
+    const audio = new Audio('ultra_instinct.mp3');
     audio.loop = false;
+    audio.volume = 0.7;
     audio.play();
     
 
     // Afficher un message immédiatement
     updateActionDisplay(`${heroData.name} est passé en Ultra Instinct !`);
 
-    // Attendre 2 secondes avant de changer l'image et les statistiques
+    // Le reste de votre fonction reste inchangé
     setTimeout(() => {
       // Augmenter les statistiques à 300
       heroData.powerstats = {
@@ -274,7 +490,7 @@ function activateUltraInstinct(heroId, heroData) {
 
       // Mettre à jour l'interface utilisateur pour refléter les nouvelles stats
       updateHeroUI(heroId, heroData);
-    }, 1000); // Attendre 2 secondes avant de changer l'image et les stats
+    }, 1000); 
   }
 }
 
@@ -419,4 +635,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Afficher le menu principal au démarrage
   showMainMenu();
+
+  // Afficher la bannière de cookies si nécessaire
+  showCookieBanner();
+
+  // Gérer le consentement des cookies
+  document.getElementById('acceptCookies').addEventListener('click', function () {
+    console.log('Cookies acceptés');
+    localStorage.setItem('cookieConsent', 'accepted');
+    cookiesAccepted = true;
+    document.getElementById('cookieBanner').classList.remove('show');
+
+    // Vérifier si l'API YouTube est prête avant d'initialiser l'audio
+    if (checkYouTubeApiReady()) {
+      initAudio();
+    } else {
+      console.log('En attente de l\'API YouTube...');
+      // onYouTubeIframeAPIReady sera appelé automatiquement quand l'API sera prête
+    }
+  });
+
+  document.getElementById('refuseCookies').addEventListener('click', function () {
+    console.log('Cookies refusés');
+    localStorage.setItem('cookieConsent', 'refused');
+    cookiesAccepted = false;
+    document.getElementById('cookieBanner').classList.remove('show');
+  });
+
+  // Audio controller event listeners
+  document.getElementById('toggleAudio').addEventListener('click', function () {
+    console.log('Clic sur le bouton audio');
+    toggleAudio();
+  });
+  document.getElementById('volumeSlider').addEventListener('input', handleVolumeChange);
+
+  // Vérifier si les cookies ont déjà été acceptés
+  if (cookiesAccepted && checkYouTubeApiReady()) {
+    console.log('Cookies déjà acceptés, initialisation audio');
+    initAudio();
+  }
 });

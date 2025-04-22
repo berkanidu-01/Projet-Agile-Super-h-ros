@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <!-- Removed header.css link as styles will be merged -->
+    <!-- Ajouter cette ligne dans la section head, avant vos autres scripts -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body class="crt-effect"> <!-- Added CRT effect -->
     <header class="site-header">
@@ -90,6 +92,27 @@
     </div>
 
     <div id="actionDisplay" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px; border-radius: 5px; font-size: 1.2rem; text-align: center; opacity: 0; transition: opacity 0.5s ease;"></div>
+
+    <!-- Bannière de cookies -->
+    <div id="cookieBanner" class="cookie-banner">
+        <div class="cookie-content">
+            <p>Ce site utilise des cookies pour améliorer votre expérience. Acceptez-vous l'utilisation de cookies ?</p>
+            <div class="cookie-buttons">
+                <button id="acceptCookies" class="cookie-btn accept">Accepter</button>
+                <button id="refuseCookies" class="cookie-btn refuse">Refuser</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contrôleur audio -->
+    <div id="audioController" class="audio-controller">
+        <button id="toggleAudio" class="audio-btn">
+            <span id="audioIcon">🔊</span>
+        </button>
+        <div class="volume-slider-container">
+            <input type="range" id="volumeSlider" min="0" max="100" value="50" class="volume-slider">
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
