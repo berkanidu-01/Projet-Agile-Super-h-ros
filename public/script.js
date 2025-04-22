@@ -11,10 +11,112 @@ let combatData = null;
 let previousHp = { hero1: MAX_HP, hero2: MAX_HP }; // Store previous HP for damage animation
 let turnCounter = 1; // Track the number of turns
 
+// Variable pour suivre si une attaque vient d'être effectuée
+let attackJustHappened = false;
+
 // Variables globales pour l'audio
 let youtubePlayer = null;
 let isMusicPlaying = false;
 let cookiesAccepted = false;
+
+// Collection de sons pour les effets
+let soundEffects = {
+  damageSounds: [],
+  deniedSounds: [],
+  loaded: false
+};
+
+// Charger les sons d'impact Roblox death et autres sons
+function loadSoundEffects() {
+  // Sons de dégâts
+  const robloxDeathSounds = [
+    'Roblox_Death_Sound-OOF.mp3',
+    // Ajoutez autant de sons que vous avez téléchargés
+  ];
+  
+  // Sons de négation (attaque bloquée ou sans effet)
+  const deniedSounds = [
+    'Denied.mp3',
+    // Vous pouvez ajouter d'autres variantes si vous en avez
+  ];
+  
+  // Précharger tous les sons de dégâts
+  robloxDeathSounds.forEach(soundFile => {
+    try {
+      const audio = new Audio(soundFile);
+      audio.preload = 'auto';
+      audio.volume = 0.5; // Volume initial à 50%
+      soundEffects.damageSounds.push(audio);
+    } catch (error) {
+      console.error(`Erreur lors du chargement du son ${soundFile}:`, error);
+    }
+  });
+  
+  // Précharger tous les sons de négation
+  deniedSounds.forEach(soundFile => {
+    try {
+      const audio = new Audio(soundFile);
+      audio.preload = 'auto';
+      audio.volume = 0.5; // Volume initial à 50%
+      soundEffects.deniedSounds.push(audio);
+    } catch (error) {
+      console.error(`Erreur lors du chargement du son ${soundFile}:`, error);
+    }
+  });
+  
+  soundEffects.loaded = soundEffects.damageSounds.length > 0 || soundEffects.deniedSounds.length > 0;
+  console.log(`${soundEffects.damageSounds.length} sons de dégâts chargés`);
+  console.log(`${soundEffects.deniedSounds.length} sons de négation chargés`);
+}
+
+// Jouer un son de dégât aléatoire
+function playRandomDamageSound() {
+  if (!soundEffects.loaded || soundEffects.damageSounds.length === 0) {
+    console.warn('Aucun son de dégât n\'est chargé');
+    return;
+  }
+  
+  // Sélectionner un son aléatoire dans la collection
+  const randomIndex = Math.floor(Math.random() * soundEffects.damageSounds.length);
+  const sound = soundEffects.damageSounds[randomIndex];
+  
+  // Réinitialiser le son s'il est en cours de lecture
+  sound.pause();
+  sound.currentTime = 0;
+  
+  // Jouer le son
+  try {
+    sound.play().catch(error => {
+      console.error('Erreur lors de la lecture du son:', error);
+    });
+  } catch (error) {
+    console.error('Erreur lors de la lecture du son:', error);
+  }
+}
+
+// Jouer un son de négation (attaque bloquée ou sans effet)
+function playDeniedSound() {
+  if (!soundEffects.loaded || soundEffects.deniedSounds.length === 0) {
+    console.warn('Aucun son de négation n\'est chargé');
+    return;
+  }
+  
+  // Sélectionner un son dans la collection (ou toujours le premier si un seul)
+  const sound = soundEffects.deniedSounds[0];
+  
+  // Réinitialiser le son s'il est en cours de lecture
+  sound.pause();
+  sound.currentTime = 0;
+  
+  // Jouer le son
+  try {
+    sound.play().catch(error => {
+      console.error('Erreur lors de la lecture du son:', error);
+    });
+  } catch (error) {
+    console.error('Erreur lors de la lecture du son:', error);
+  }
+}
 
 // --- DOM Elements ---
 const hpLeftFill = document.getElementById('hpLeftFill');
@@ -184,10 +286,25 @@ function toggleAudio() {
 
 // Gérer le changement de volume
 function handleVolumeChange(e) {
-  if (!youtubePlayer) return;
-  
   const volume = e.target.value;
-  youtubePlayer.setVolume(volume);
+  
+  // Ajuster le volume du lecteur YouTube
+  if (youtubePlayer) {
+    youtubePlayer.setVolume(volume);
+  }
+  
+  // Ajuster le volume des effets sonores
+  const volumeRatio = volume / 100; // Convertir 0-100 en 0-1 pour l'API Audio
+  
+  // Ajuster le volume des sons de dégâts
+  soundEffects.damageSounds.forEach(sound => {
+    sound.volume = volumeRatio * 0.6; // 60% du volume principal
+  });
+  
+  // Ajuster le volume des sons de négation
+  soundEffects.deniedSounds.forEach(sound => {
+    sound.volume = volumeRatio * 0.4; // 40% du volume principal (moins fort)
+  });
 }
 
 // Mettre à jour l'icône audio
@@ -300,6 +417,10 @@ function updateHeroUI(heroSide, heroData) {
 
   // Trigger Damage Animation if HP decreased
   if (currentHp < previousHeroHp) {
+    // Jouer un son de dégât aléatoire
+    playRandomDamageSound();
+    
+    // Animation d'impact (déjà existante)
     hpContainerEl.classList.add('damage');
     setTimeout(() => {
       hpContainerEl.classList.remove('damage');
@@ -396,17 +517,53 @@ async function playTurn(attackIndex, defenseIndex = null) {
   });
 
   const data = await response.json();
+  
+  // Sauvegardez l'état précédent pour comparaison
+  const previousHero1Hp = combatData.hero1.hp;
+  const previousHero2Hp = combatData.hero2.hp;
+  const previousPhase = combatData.currentPhase;
+  const previousTurn = combatData.currentTurn;
+  
+  // Mettre à jour les données de combat
   combatData = data.combatData;
+  
+  // Déterminer si une attaque vient d'être effectuée sans causer de dégâts
+  if (previousPhase === 'attack' && combatData.currentPhase === 'defense') {
+    // Une attaque vient d'être sélectionnée
+    attackJustHappened = true;
+  } else if (previousPhase === 'defense' && combatData.currentPhase === 'attack') {
+    // L'attaque est terminée, vérifier si des dégâts ont été infligés
+    const defenderHero = previousTurn === 'hero1' ? 'hero2' : 'hero1';
+    const previousHp = defenderHero === 'hero1' ? previousHero1Hp : previousHero2Hp;
+    const currentHp = defenderHero === 'hero1' ? combatData.hero1.hp : combatData.hero2.hp;
+    
+    if (previousHp === currentHp && data.result && data.result.damage === 0) {
+      // L'attaque n'a pas causé de dégâts, jouer le son denied
+      playDeniedSound();
+      
+      // Ajouter l'animation de blocage sur la barre de vie du défenseur
+      const defenderHpContainer = defenderHero === 'hero1' ? hpLeftContainer : hpRightContainer;
+      defenderHpContainer.classList.add('blocked');
+      setTimeout(() => {
+        defenderHpContainer.classList.remove('blocked');
+      }, 300);
+    }
+    
+    // Réinitialiser le flag
+    attackJustHappened = false;
+  }
 
+  // Mettre à jour l'interface
   updateHeroUI('heroLeft', combatData.hero1);
   updateHeroUI('heroRight', combatData.hero2);
   updateTurnIndicator();
   updateButtonsForPhase();
 
+  // Gérer le résultat et l'historique
   if (data.result) {
-    const { attacker, attackUsed, defenderHp, defenseUsed, damage } = data.result;
-    const attackerName = combatData[combatData.currentTurn].name;
-    const defenderName = combatData[combatData.currentTurn === 'hero1' ? 'hero2' : 'hero1'].name;
+    const { attackUsed, defenderHp, defenseUsed, damage } = data.result;
+    const attackerName = previousTurn === 'hero1' ? combatData.hero1.name : combatData.hero2.name;
+    const defenderName = previousTurn === 'hero1' ? combatData.hero2.name : combatData.hero1.name;
 
     addToHistory(turnCounter, attackerName, attackUsed, defenderName, defenseUsed, damage, defenderHp);
     turnCounter++;

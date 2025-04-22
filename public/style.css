@@ -130,6 +130,17 @@ body {
     100% { transform: translateX(0) rotate(0deg); }
 }
 
+/* Animation pour les attaques bloquées ou sans effet */
+.hp-bar.blocked {
+  animation: deflect 0.3s ease;
+}
+
+@keyframes deflect {
+  0% { transform: translateY(0); filter: brightness(1); }
+  50% { transform: translateY(-3px); filter: brightness(1.3); }
+  100% { transform: translateY(0); filter: brightness(1); }
+}
+
 
 /* --- Fighters --- */
 .fighters-container {
