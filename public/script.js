@@ -11,9 +11,6 @@ let combatData = null;
 let previousHp = { hero1: MAX_HP, hero2: MAX_HP }; // Store previous HP for damage animation
 let turnCounter = 1; // Track the number of turns
 
-// Variable pour suivre si une attaque vient d'être effectuée
-let attackJustHappened = false;
-
 // Variables globales pour l'audio
 let youtubePlayer = null;
 let isMusicPlaying = false;
@@ -28,24 +25,37 @@ let soundEffects = {
 
 // Charger les sons d'impact Roblox death et autres sons
 function loadSoundEffects() {
+  console.log("Début du chargement des sons...");
+  
   // Sons de dégâts
   const robloxDeathSounds = [
     'Roblox_Death_Sound-OOF.mp3',
-    // Ajoutez autant de sons que vous avez téléchargés
   ];
   
   // Sons de négation (attaque bloquée ou sans effet)
   const deniedSounds = [
     'Denied.mp3',
-    // Vous pouvez ajouter d'autres variantes si vous en avez
   ];
+  
+  console.log("Fichiers à charger:", robloxDeathSounds, deniedSounds);
   
   // Précharger tous les sons de dégâts
   robloxDeathSounds.forEach(soundFile => {
     try {
+      console.log(`Tentative de chargement du son: ${soundFile}`);
       const audio = new Audio(soundFile);
       audio.preload = 'auto';
-      audio.volume = 0.5; // Volume initial à 50%
+      audio.volume = 0.5;
+      
+      // Ajouter des événements pour détecter les problèmes de chargement
+      audio.addEventListener('canplaythrough', () => {
+        console.log(`Son ${soundFile} chargé avec succès`);
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error(`Erreur de chargement du son ${soundFile}:`, e);
+      });
+      
       soundEffects.damageSounds.push(audio);
     } catch (error) {
       console.error(`Erreur lors du chargement du son ${soundFile}:`, error);
@@ -376,9 +386,25 @@ async function initCombat() {
     updateTurnIndicator();
     updateButtonsForPhase();
 
-    // Ajouter un événement de clic sur les images des héros
-    heroLeftImgEl.addEventListener('click', () => activateUltraInstinct('heroLeft', combatData.hero1));
-    heroRightImgEl.addEventListener('click', () => activateUltraInstinct('heroRight', combatData.hero2));
+    // Supprimer les écouteurs précédents SANS clonage
+    heroLeftImgEl.onclick = null;
+    heroRightImgEl.onclick = null;
+    
+    // Mettre à jour le style pour indiquer qu'ils sont cliquables
+    heroLeftImgEl.style.cursor = "pointer";
+    heroRightImgEl.style.cursor = "pointer";
+
+    // Ajouter des écouteurs d'événements avec une fonction nommée (plus facile à déboguer)
+    heroLeftImgEl.onclick = function() {
+      console.log("Image du héros gauche cliquée");
+      activateUltraInstinct('heroLeft', combatData.hero1);
+    };
+    
+    heroRightImgEl.onclick = function() {
+      console.log("Image du héros droite cliquée");
+      activateUltraInstinct('heroRight', combatData.hero2);
+    };
+
   } catch (error) {
     console.error("Failed to initialize combat:", error);
     turnIndicatorEl.textContent = "Erreur de chargement...";
@@ -598,12 +624,25 @@ function handleButtonClick(index) {
   // No 'else' needed as buttons for the wrong player/phase should be implicitly handled by updateButtonsForPhase or game logic
 }
 
+// Variable pour suivre si une attaque vient d'être effectuée
+let attackJustHappened = false;
+
 // Active Ultra Instinct pour Goku
 function activateUltraInstinct(heroId, heroData) {
-  if (heroData.name.toLowerCase() === 'goku') {
+  console.log("Tentative d'activation d'Ultra Instinct pour:", heroData.name);
+  
+  // Vérification du héros avec plus de tolérance sur le nom
+  if (heroData.name && heroData.name.toLowerCase().includes('goku')) {
+    console.log("Héros identifié comme Goku, vérification de l'état Ultra Instinct");
+    
     // Vérifier si Goku est déjà en Ultra Instinct
-    if (heroData.isUltraInstinct) return;
+    if (heroData.isUltraInstinct) {
+      console.log("Ultra Instinct déjà activé");
+      return;
+    }
 
+    console.log("Activation d'Ultra Instinct...");
+    
     // Marquer que Goku est en Ultra Instinct
     heroData.isUltraInstinct = true;
 
@@ -611,17 +650,30 @@ function activateUltraInstinct(heroId, heroData) {
     pauseYouTubeTemporarily(4000);
 
     // Jouer le thème musical d'ultra instinct
-    const audio = new Audio('ultra_instinct.mp3');
-    audio.loop = false;
-    audio.volume = 0.7;
-    audio.play();
-    
+    try {
+      const audio = new Audio('ultra_instinct.mp3');
+      audio.loop = false;
+      audio.volume = 0.7;
+      
+      audio.addEventListener('canplaythrough', () => {
+        console.log("Son Ultra Instinct chargé avec succès");
+        audio.play().catch(e => console.error("Erreur de lecture du son Ultra Instinct:", e));
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error("Erreur de chargement du son Ultra Instinct:", e);
+      });
+    } catch (error) {
+      console.error("Erreur lors de la création de l'audio Ultra Instinct:", error);
+    }
 
     // Afficher un message immédiatement
     updateActionDisplay(`${heroData.name} est passé en Ultra Instinct !`);
 
-    // Le reste de votre fonction reste inchangé
+    // Changement de statistiques et d'apparence
     setTimeout(() => {
+      console.log("Application des transformations Ultra Instinct...");
+      
       // Augmenter les statistiques à 300
       heroData.powerstats = {
         intelligence: 300,
@@ -634,20 +686,42 @@ function activateUltraInstinct(heroId, heroData) {
 
       // Changer l'image de Goku en Ultra Instinct avec un effet de fondu
       const heroElement = document.getElementById(heroId);
+      if (!heroElement) {
+        console.error("Élément héros non trouvé:", heroId);
+        return;
+      }
+      
       const heroImg = heroElement.querySelector('.fighter-sprite');
+      if (!heroImg) {
+        console.error("Image du combattant non trouvée");
+        return;
+      }
+      
       heroImg.style.transition = 'opacity 2s ease';
       heroImg.style.opacity = 0;
-
-      heroImg.src = 'https://i.pinimg.com/736x/f1/50/68/f1506824eb8b77d75d3ae98c2557f617.jpg'; // Image de Goku Ultra Instinct
-      heroImg.style.opacity = 1;
+      
+      // Utiliser un setTimeout pour s'assurer que l'effet de fondu est visible
+      setTimeout(() => {
+        heroImg.src = 'https://i.pinimg.com/736x/f1/50/68/f1506824eb8b77d75d3ae98c2557f617.jpg';
+        heroImg.style.opacity = 1;
+        console.log("Image Ultra Instinct appliquée");
+      }, 500);
 
       // Mettre à jour les barres de statistiques avec une animation
       const stats = heroElement.querySelectorAll('.stat-row');
-      animateStatIncrease(stats, heroData.powerstats);
+      if (stats.length > 0) {
+        animateStatIncrease(stats, heroData.powerstats);
+        console.log("Animation des statistiques démarrée");
+      } else {
+        console.error("Éléments de statistiques non trouvés");
+      }
 
       // Mettre à jour l'interface utilisateur pour refléter les nouvelles stats
       updateHeroUI(heroId, heroData);
-    }, 1000); 
+      console.log("Interface utilisateur mise à jour");
+    }, 1000);
+  } else {
+    console.log("Ce héros n'est pas Goku, Ultra Instinct non disponible");
   }
 }
 
@@ -725,12 +799,19 @@ function updateActionDisplay(message) {
 
 // --- Initialisation ---
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("DOM chargé, initialisation du jeu...");
+  
+  // Chargement des sons d'effet
+  loadSoundEffects();
+  
   const mainMenu = document.getElementById('mainMenu');
   const charactersMenu = document.getElementById('charactersMenu');
   const playButton = document.getElementById('playButton');
   const charactersButton = document.getElementById('charactersButton');
   const backToMenuButton = document.getElementById('backToMenuButton');
   const charactersList = document.getElementById('charactersList');
+  const homeButton = document.getElementById('homeButton');
+  const restartButton = document.getElementById('restartButton');
 
   // Afficher le menu principal
   function showMainMenu() {
@@ -754,6 +835,24 @@ document.addEventListener('DOMContentLoaded', () => {
     mainMenu.classList.add('hidden');
     document.querySelector('.arena').style.display = 'block';
     initCombat();
+  }
+
+  // Fonction pour redémarrer le jeu
+  function restartGame() {
+    // Réinitialiser les valeurs de combat
+    combatData = null;
+    previousHp = { hero1: MAX_HP, hero2: MAX_HP };
+    turnCounter = 1;
+    
+    // Réinitialiser l'interface
+    const historyList = document.getElementById('historyList');
+    if (historyList) historyList.innerHTML = '';
+    
+    // Relancer le combat
+    initCombat();
+    
+    // Afficher un message
+    updateActionDisplay("Nouvelle partie commencée !");
   }
 
   // Charger les personnages
@@ -789,6 +888,19 @@ document.addEventListener('DOMContentLoaded', () => {
   playButton.addEventListener('click', startGame);
   charactersButton.addEventListener('click', showCharactersMenu);
   backToMenuButton.addEventListener('click', showMainMenu);
+  
+  // Nouveaux gestionnaires pour les boutons de contrôle du jeu
+  homeButton.addEventListener('click', () => {
+    // Stopper la musique YouTube si elle est en cours
+    if (youtubePlayer && isMusicPlaying) {
+      youtubePlayer.pauseVideo();
+      isMusicPlaying = false;
+      updateAudioIcon();
+    }
+    showMainMenu();
+  });
+  
+  restartButton.addEventListener('click', restartGame);
 
   // Afficher le menu principal au démarrage
   showMainMenu();
@@ -831,4 +943,12 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Cookies déjà acceptés, initialisation audio');
     initAudio();
   }
+
+  // Écouteur global pour le débogage
+  document.addEventListener('click', function(e) {
+    console.log('Élément cliqué:', e.target);
+    if (e.target.classList.contains('fighter-sprite')) {
+      console.log('Image de héros cliquée!');
+    }
+  });
 });
