@@ -469,6 +469,47 @@ async function initCombat() {
   }
 }
 
+// Initialise le goku
+async function initCombatGoku() {
+  try {
+    const response = await fetch('/api/combat/goku', { method: 'POST' });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    combatData = await response.json();
+
+    // Initialize previous HP
+    previousHp.hero1 = combatData.hero1.hp;
+    previousHp.hero2 = combatData.hero2.hp;
+
+    updateHeroUI('heroLeft', combatData.hero1);
+    updateHeroUI('heroRight', combatData.hero2);
+    updateTurnIndicator();
+    updateButtonsForPhase();
+
+    // Supprimer les écouteurs précédents SANS clonage
+    heroLeftImgEl.onclick = null;
+    heroRightImgEl.onclick = null;
+    
+    // Mettre à jour le style pour indiquer qu'ils sont cliquables
+    heroLeftImgEl.style.cursor = "pointer";
+    heroRightImgEl.style.cursor = "pointer";
+
+    // Ajouter des écouteurs d'événements avec une fonction nommée (plus facile à déboguer)
+    heroLeftImgEl.onclick = function() {
+      console.log("Image du héros gauche cliquée");
+      activateUltraInstinct('heroLeft', combatData.hero1);
+    };
+    
+    heroRightImgEl.onclick = function() {
+      console.log("Image du héros droite cliquée");
+      activateUltraInstinct('heroRight', combatData.hero2);
+    };
+
+  } catch (error) {
+    console.error("Failed to initialize combat:", error);
+    turnIndicatorEl.textContent = "Erreur de chargement...";
+  }
+}
+
 // Met à jour l'interface utilisateur pour un héros (Left or Right)
 function updateHeroUI(heroSide, heroData) {
   const isLeft = heroSide === 'heroLeft';
@@ -923,7 +964,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.arena').style.display = 'block';
 
     // Générer les personnages avant d'afficher le GIF
-    initCombat().then(() => {
+    initCombatGoku().then(() => {
         // Afficher le GIF de Fight après la génération des personnages
         showFightGif();
 
