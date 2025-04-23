@@ -1049,7 +1049,8 @@ document.addEventListener('DOMContentLoaded', () => {
       isMusicPlaying = false;
       updateAudioIcon();
     }
-    showMainMenu();
+    location.reload(); // Recharger la page pour revenir au menu principal
+    // showMainMenu();
   });
   
   restartButton.addEventListener('click', restartGame);
