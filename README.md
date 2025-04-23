@@ -21,16 +21,18 @@ SuperHeroes Retro Battle est un projet de jeu de combat rétro en ligne basé su
 
 1. Clonez le projet:
    ```sh
-   git clone https://github.com/ton-utilisateur/rpg-api.git
-   cd rpg-api
+   git clone https://github.com/berkanidu-01/Projet-Agile-Super-h-ros.com
+   cd Projet-Agile-Super-h-ros
 
-2. Installez les dépendances: 
-npm install
+2. Installez les dépendances:
+   ```sh
+   npm install
 
-3. Lancez le serveur:
-node server.js
+4. Lancez le serveur:
+   ```sh
+   ¬¬node server.js
 
-4. Ouvrez votre navigateur et accédez à http://localhost:3000
+6. Ouvrez votre navigateur et accédez à http://localhost:3000
 
 ## Utilisation
 ### Lancer le jeu
