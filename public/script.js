@@ -146,6 +146,13 @@ const heroRightStatsEl = document.getElementById('heroRightStats');
 const moveButtonsContainer = document.getElementById('moveButtons');
 const turnIndicatorEl = document.getElementById('turnIndicator');
 
+// DOM Elements pour la popup
+const endGamePopup = document.getElementById('endGamePopup');
+const winnerTitle = document.getElementById('winnerTitle');
+const winnerMessage = document.getElementById('winnerMessage');
+const viewHistoryButton = document.getElementById('viewHistoryButton');
+const closePopupButton = document.getElementById('closePopupButton');
+
 // Fonction pour vérifier si les cookies ont été acceptés
 function checkCookieConsent() {
   const cookieConsent = localStorage.getItem('cookieConsent');
@@ -598,7 +605,10 @@ async function playTurn(attackIndex, defenseIndex = null) {
   if (data.winner) {
     updateActionDisplay(`${data.winner} a gagné le combat !`);
     addToHistory(turnCounter, data.winner, "Victoire", "", "", 0, 0);
-    alert(`${data.winner} a gagné le combat !`);
+
+    // Afficher la popup de fin de combat
+    const loser = data.winner === combatData.hero1.name ? combatData.hero2.name : combatData.hero1.name;
+    showEndGamePopup(data.winner, loser);
   }
 }
 
@@ -796,6 +806,29 @@ function updateActionDisplay(message) {
     actionDisplay.style.opacity = 0;
   }, 3000); // Le message disparaît après 3 secondes
 }
+
+// Fonction pour afficher la popup de fin de combat
+function showEndGamePopup(winner, loser) {
+    winnerTitle.textContent = `${winner} a gagné !`;
+    winnerMessage.textContent = `${winner} a vaincu ${loser} dans un combat épique !`;
+    endGamePopup.classList.remove('hidden');
+    endGamePopup.style.display = 'block';
+}
+
+// Fonction pour fermer la popup
+function closeEndGamePopup() {
+    endGamePopup.classList.add('hidden');
+    endGamePopup.style.display = 'none';
+}
+
+// Gestionnaire pour afficher l'historique
+viewHistoryButton.addEventListener('click', () => {
+    closeEndGamePopup();
+    document.getElementById('combatHistory').style.transform = 'translateX(0)';
+});
+
+// Gestionnaire pour fermer la popup
+closePopupButton.addEventListener('click', closeEndGamePopup);
 
 // --- Initialisation ---
 document.addEventListener('DOMContentLoaded', () => {

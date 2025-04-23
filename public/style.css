@@ -703,3 +703,67 @@ body {
 .restart-btn:hover {
     background-color: #6a4f30;
 }
+
+/* Popup de fin de combat */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #ff6b00;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+    z-index: 2000;
+    width: 400px;
+    text-align: center;
+    display: none;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-content h2 {
+    color: #ffd700;
+    font-size: 2rem;
+    text-shadow: 2px 2px 0 #ff6b00;
+    margin-bottom: 1rem;
+}
+
+.popup-content p {
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.popup-btn {
+    background: #4a2f10;
+    border: 2px solid #ff6b00;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 2px 2px 0px #803600;
+}
+
+.popup-btn:hover {
+    background: #6a4f30;
+    box-shadow: 2px 2px 0px #b05000;
+}
+
+.popup-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+    background: #ff6b00;
+}
