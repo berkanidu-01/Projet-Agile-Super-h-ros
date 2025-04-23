@@ -101,6 +101,30 @@ app.post('/api/combat/init', (req, res) => {
   });
 });
 
+// Initialise un combat avec deux héros aléatoires
+app.post('/api/combat/goku', (req, res) => {
+  Superhero.getGokuPair((err, heroes) => {
+    if (err) return res.status(500).send('Erreur serveur');
+    const combatData = {
+      hero1: { ...heroes[0], hp: 1000, attacks: [], defenses: [] },
+      hero2: { ...heroes[1], hp: 1000, attacks: [], defenses: [] },
+      currentTurn: 'hero1',
+      currentPhase: 'attack',
+    };
+    Attack.getAll((err, attacks) => {
+      if (err) return res.status(500).send('Erreur serveur');
+      combatData.hero1.attacks = attacks.slice(0, 4);
+      combatData.hero2.attacks = attacks.slice(4, 8);
+      Defense.getAll((err, defenses) => {
+        if (err) return res.status(500).send('Erreur serveur');
+        combatData.hero1.defenses = defenses.slice(0, 4);
+        combatData.hero2.defenses = defenses.slice(4, 8);
+        res.json(combatData);
+      });
+    });
+  });
+});
+
 // Gère un tour de combat
 app.post('/api/combat/turn', (req, res) => {
   const { combatData, attackIndex, defenseIndex } = req.body;

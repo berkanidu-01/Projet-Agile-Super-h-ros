@@ -125,6 +125,46 @@ class Superhero {
       }
     });
   }
+  static getGokuPair(callback) {
+    const sql = `
+      SELECT * 
+      FROM SuperHeros
+      WHERE id = 210
+        OR id IN (
+          SELECT id
+          FROM SuperHeros
+          WHERE id != 209
+          ORDER BY RANDOM()
+          LIMIT 1
+        );
+    `;
+  
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        callback(err, null);
+        return;
+      }
+      if (rows.length < 2) {
+        callback(new Error('Pas assez de super-héros dans la base de données'), null);
+        return;
+      }
+  
+      const heroes = rows.map(row => new Superhero(row.id, row.name, row.slug));
+      let loadedCount = 0;
+  
+      heroes.forEach(hero => {
+        hero.loadPowerstats(err => {
+          if (err) {
+            callback(err, null);
+            return;
+          }
+          if (++loadedCount === heroes.length) {
+            callback(null, heroes);
+          }
+        });
+      });
+    });
+  }
 }
 
 module.exports = Superhero;
