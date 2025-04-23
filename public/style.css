@@ -767,3 +767,35 @@ body {
     box-shadow: none;
     background: #ff6b00;
 }
+
+/* Styles pour les GIFs */
+.gif-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3000;
+    display: none;
+}
+
+.gif-overlay img {
+    width: 600px; /* Taille augmentée */
+    height: auto;
+    animation: fadeInOut 2s ease-in-out;
+}
+
+/* Animation pour faire apparaître et disparaître les GIFs */
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

@@ -153,6 +153,57 @@ const winnerMessage = document.getElementById('winnerMessage');
 const viewHistoryButton = document.getElementById('viewHistoryButton');
 const closePopupButton = document.getElementById('closePopupButton');
 
+// DOM Elements pour les GIFs
+const fightGif = document.getElementById('fightGif');
+const koGif = document.getElementById('koGif');
+
+// Fonction pour afficher le GIF de Fight
+function showFightGif() {
+    const fightSound = new Audio('fight_sfx.mp3'); // Chargez le son de Fight
+    fightSound.volume = 0.7; // Ajustez le volume si nécessaire
+    fightSound.play().catch(error => console.error('Erreur lors de la lecture du son Fight:', error));
+
+    fightGif.classList.remove('hidden');
+    fightGif.style.display = 'block';
+
+    // Masquer le GIF après 2 secondes
+    setTimeout(() => {
+        fightGif.classList.add('hidden');
+        fightGif.style.display = 'none';
+    }, 2000);
+}
+
+// Fonction pour afficher le GIF de KO
+function showKoGif(callback) {
+    const koSound = new Audio('KO.mp3'); // Chargez le son de KO
+    koSound.volume = 0.7; // Ajustez le volume si nécessaire
+    koSound.play().catch(error => console.error('Erreur lors de la lecture du son KO:', error));
+
+    koGif.classList.remove('hidden');
+    koGif.style.display = 'block';
+
+    // Masquer le GIF après 2 secondes et exécuter un callback
+    setTimeout(() => {
+        koGif.classList.add('hidden');
+        koGif.style.display = 'none';
+        if (callback) callback();
+    }, 2000);
+}
+
+// Fonction pour afficher le GIF de Victory
+function showVictoryGif(callback) {
+    const victoryGif = document.getElementById('victoryGif');
+    victoryGif.classList.remove('hidden');
+    victoryGif.style.display = 'block';
+
+    // Masquer le GIF après 2 secondes et exécuter un callback (comme afficher la popup)
+    setTimeout(() => {
+        victoryGif.classList.add('hidden');
+        victoryGif.style.display = 'none';
+        if (callback) callback();
+    }, 1000);
+}
+
 // Fonction pour vérifier si les cookies ont été acceptés
 function checkCookieConsent() {
   const cookieConsent = localStorage.getItem('cookieConsent');
@@ -520,7 +571,6 @@ function updateButtonsForPhase() {
     }
     button.style.backgroundColor = '#4a2f10'; // Reset background
 
-
     // Update button click handler (remove old before adding new)
     // Clone the button to remove all previous event listeners
     const newButton = button.cloneNode(true);
@@ -606,9 +656,13 @@ async function playTurn(attackIndex, defenseIndex = null) {
     updateActionDisplay(`${data.winner} a gagné le combat !`);
     addToHistory(turnCounter, data.winner, "Victoire", "", "", 0, 0);
 
-    // Afficher la popup de fin de combat
+    // Afficher le GIF de KO suivi du GIF de Victory, puis afficher la popup
     const loser = data.winner === combatData.hero1.name ? combatData.hero2.name : combatData.hero1.name;
-    showEndGamePopup(data.winner, loser);
+    showKoGif(() => {
+        showVictoryGif(() => {
+            showEndGamePopup(data.winner, loser);
+        });
+    });
   }
 }
 
@@ -862,12 +916,23 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCharacters();
   }
 
-  // Lancer le jeu
+  // Fonction pour lancer le jeu
   function startGame() {
     document.body.classList.remove('menu-visible');
     mainMenu.classList.add('hidden');
     document.querySelector('.arena').style.display = 'block';
-    initCombat();
+
+    // Générer les personnages avant d'afficher le GIF
+    initCombat().then(() => {
+        // Afficher le GIF de Fight après la génération des personnages
+        showFightGif();
+
+        // Démarrer le combat après un court délai pour laisser le GIF s'afficher
+        setTimeout(() => {
+            updateTurnIndicator();
+            updateButtonsForPhase();
+        }, 2000);
+    });
   }
 
   // Fonction pour redémarrer le jeu

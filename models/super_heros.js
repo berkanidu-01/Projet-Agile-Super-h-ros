@@ -98,8 +98,8 @@ class Superhero {
 
   // Récupérer deux super-héros aléatoires avec leurs powerstats et images
   static getRandomPair(callback) {
-    /// const sql = 'SELECT * FROM SuperHeros ORDER BY RANDOM() LIMIT 2';
-    const sql = 'SELECT * FROM SuperHeros WHERE id IN (210, 209)'; // Récupérer deux héros par ID
+    const sql = 'SELECT * FROM SuperHeros ORDER BY RANDOM() LIMIT 2';
+    // const sql = 'SELECT * FROM SuperHeros WHERE id IN (210, 209)'; // Récupérer deux héros par ID
     db.all(sql, [], (err, rows) => {
       if (err) {
         callback(err, null);
