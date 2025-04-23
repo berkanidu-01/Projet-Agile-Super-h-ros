@@ -156,6 +156,13 @@ const closePopupButton = document.getElementById('closePopupButton');
 // DOM Elements pour les GIFs
 const fightGif = document.getElementById('fightGif');
 const koGif = document.getElementById('koGif');
+const VSGif = document.getElementById('VSGif');
+
+function showVSGif() {
+  VSGif.classList.remove('hidden');
+  VSGif.style.display = 'block';
+
+}
 
 // Fonction pour afficher le GIF de Fight
 function showFightGif() {
@@ -170,14 +177,20 @@ function showFightGif() {
     setTimeout(() => {
         fightGif.classList.add('hidden');
         fightGif.style.display = 'none';
-    }, 2000);
+        showVSGif();
+    }, 950);
 }
+
+
 
 // Fonction pour afficher le GIF de KO
 function showKoGif(callback) {
     const koSound = new Audio('KO.mp3'); // Chargez le son de KO
     koSound.volume = 0.7; // Ajustez le volume si nécessaire
     koSound.play().catch(error => console.error('Erreur lors de la lecture du son KO:', error));
+
+    VSGif.classList.add('hidden');
+    VSGif.style.display = 'none';
 
     koGif.classList.remove('hidden');
     koGif.style.display = 'block';
@@ -187,7 +200,7 @@ function showKoGif(callback) {
         koGif.classList.add('hidden');
         koGif.style.display = 'none';
         if (callback) callback();
-    }, 2000);
+    }, 950);
 }
 
 // Fonction pour afficher le GIF de Victory
