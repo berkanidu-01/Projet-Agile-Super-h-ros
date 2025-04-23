@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperHeroes Retro Battle</title>
+    <!-- Using the retro font from your style.css -->
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Removed header.css link as styles will be merged -->
+    <!-- Ajouter cette ligne dans la section head, avant vos autres scripts -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body class="crt-effect"> <!-- Added CRT effect -->
+    <header class="site-header">
+        <!-- Using the site-title style from retro style.css -->
+        <h1 class="site-title">Super<span>Heroes</span> Battle</h1>
+    </header>
+
+    <div id="mainMenu" class="menu">
+        <h1 class="menu-title">SuperHeroes Battle</h1>
+        <div class="menu-buttons">
+            <button id="playButton" class="menu-btn">Jouer</button>
+            <button id="charactersButton" class="menu-btn">Personnages</button>
+        </div>
+    </div>
+
+    <div id="charactersMenu" class="menu hidden">
+        <h1 class="menu-title">Personnages</h1>
+        <div id="charactersList" class="characters-list">
+            <!-- Les personnages seront ajoutés dynamiquement ici -->
+        </div>
+        <button id="backToMenuButton" class="menu-btn">Retour</button>
+    </div>
+
+    <div class="arena">
+        <!-- Top HP Bars -->
+        <div class="hp-bar left-hp" id="hpLeftContainer">
+            <div class="hp-fill" id="hpLeftFill"></div>
+            <span class="hp-text" id="hpLeftText">P1 HP: 1000</span> <!-- Optional: Text on HP Bar -->
+        </div>
+        <div class="hp-bar right-hp" id="hpRightContainer">
+             <div class="hp-fill" id="hpRightFill"></div>
+             <span class="hp-text" id="hpRightText">P2 HP: 1000</span> <!-- Optional: Text on HP Bar -->
+        </div>
+
+        <!-- Fighters -->
+        <div class="fighters-container">
+            <div class="fighter-card" id="heroLeft">
+                <h3 class="username">Joueur 1</h3>
+                <h2 class="heroName" id="heroLeftName">Nom du héros</h2>
+                <img src="hero.jpg" alt="Hero 1 Sprite" class="fighter-sprite" id="heroLeftImg">
+                <div class="fighter-stats" id="heroLeftStats">
+                    <!-- Stats will be populated by JS, example structure: -->
+                    <!-- <div class="stat-row"><span>INT</span><div class="stat-bar"><div class="stat-fill" style="width: 80%;"></div></div></div> -->
+                </div>
+            </div>
+
+            <div class="fighter-card" id="heroRight">
+                <h3 class="username">Joueur 2</h3>
+                 <h2 class="heroName" id="heroRightName">Nom du héros</h2>
+                <img src="hero.jpg" alt="Hero 2 Sprite" class="fighter-sprite" id="heroRightImg">
+                <div class="fighter-stats" id="heroRightStats">
+                     <!-- Stats will be populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom UI: Moves and Turn Indicator -->
+        <div class="fight-ui">
+            <div class="moveset" id="moveButtons">
+                <!-- Buttons will be styled as fight-btn by JS/CSS -->
+                <button id="move1">Move 1</button>
+                <button id="move2">Move 2</button>
+                <button id="move3">Move 3</button>
+                <button id="move4">Move 4</button>
+            </div>
+            <div class="turn-display" id="turnIndicator">
+                LOADING...
+            </div>
+            <div class="game-controls">
+                <button id="homeButton" class="control-btn home-btn">Accueil</button>
+                <button id="restartButton" class="control-btn restart-btn">Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="combatHistory">
+        <div id="historyToggle">
+            <span>&#9664;</span> <!-- Flèche gauche -->
+        </div>
+        <div id="historyContent">
+            <h2>Historique du Combat</h2>
+            <ul id="historyList"></ul>
+        </div>
+    </div>
+
+    <div id="actionDisplay" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.7); color: white; padding: 10px 20px; border-radius: 5px; font-size: 1.2rem; text-align: center; opacity: 0; transition: opacity 0.5s ease;"></div>
+
+    <!-- GIF de Fight -->
+    <div id="fightGif" class="gif-overlay hidden">
+        <img src="intro.gif" alt="Fight!" />
+    </div>
+
+    <!-- GIF de VS -->
+    <div id="VSGif" class="gif-overlay hidden">
+        <img src="VS.gif" alt="VS" />
+    </div>
+
+    <!-- GIF de KO -->
+    <div id="koGif" class="gif-overlay hidden">
+        <img src="victory.gif" alt="KO!" />
+    </div>
+
+    <!-- GIF de Victory -->
+    <div id="victoryGif" class="gif-overlay hidden">
+        <img src="victory.gif" alt="Victory!" />
+    </div>
+
+    <!-- Popup de fin de combat -->
+    <div id="endGamePopup" class="popup hidden">
+        <div class="popup-content">
+            <h2 id="winnerTitle">Victoire !</h2>
+            <p id="winnerMessage"></p>
+            <div class="popup-buttons">
+                <button id="viewHistoryButton" class="popup-btn">Voir l'historique</button>
+                <button id="closePopupButton" class="popup-btn">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bannière de cookies -->
+    <div id="cookieBanner" class="cookie-banner">
+        <div class="cookie-content">
+            <p>Ce site utilise des cookies pour améliorer votre expérience. Acceptez-vous l'utilisation de cookies ?</p>
+            <div class="cookie-buttons">
+                <button id="acceptCookies" class="cookie-btn accept">Accepter</button>
+                <button id="refuseCookies" class="cookie-btn refuse">Refuser</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contrôleur audio -->
+    <div id="audioController" class="audio-controller">
+        <button id="toggleAudio" class="audio-btn">
+            <span id="audioIcon">🔊</span>
+        </button>
+        <div class="volume-slider-container">
+            <input type="range" id="volumeSlider" min="0" max="100" value="50" class="volume-slider">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
